@@ -214,8 +214,10 @@ $env:JAVA_HOME='<path-to-jdk-17-or-newer>'
 ## Release Status
 
 `0.11.0-local` is a packaged, checksummed Windows App Demo baseline for the
-documented loopback-only, single-Python-runtime scope. It is not yet a signed GitHub
-Release, native installer, bundled runtime/model distribution, or public deployment.
+documented loopback-only, single-Python-runtime scope. The audited checkpoint is
+published as the unsigned GitHub prerelease `v0.11.0-local` with a Windows ZIP and
+SHA-256 file. It is not a native installer, bundled runtime/model distribution, or
+public deployment.
 
 Latest recorded local source-tree checkpoint:
 

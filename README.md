@@ -2,6 +2,9 @@
 
 > **MyAI — Design and Implementation of a Personal Intelligent Assistant Based on Open-Source Large Language Models**
 
+[![CI](https://github.com/linjialiang0814/MyAI/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/linjialiang0814/MyAI/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/linjialiang0814/MyAI?include_prereleases&label=release)](https://github.com/linjialiang0814/MyAI/releases/tag/v0.11.0-local)
+
 MyAI 是一个面向个人、本地优先的智能体应用。它以 Spring Boot 管理用户、会话、消息与 Web 界面，以 FastAPI 统一编排模型、记忆、知识库、任务和工具；默认仅监听本机回环地址，并提供可审计的运行轨迹、可复现实验和 Windows 便携 App Demo。
 
 当前版本：**0.11.0-local**
@@ -148,6 +151,9 @@ MYAI_LLM_FALLBACK_TO_STUB=false
 重新启动 MyAI 后，在“设置 → 系统健康”执行真实模型探测。不要提交 **.env**、模型权重、数据库或日志。更完整配置见 [配置参考](docs/CONFIGURATION_REFERENCE.md)。
 
 ## Windows 便携 App Demo
+
+可直接从 [GitHub Release v0.11.0-local](https://github.com/linjialiang0814/MyAI/releases/tag/v0.11.0-local)
+下载 Windows ZIP 与配套 SHA-256 文件。下载后应先核对校验和，再解压到长度不超过 100 个字符的本地目录。
 
 构建并校验：
 
