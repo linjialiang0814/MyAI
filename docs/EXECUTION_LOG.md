@@ -1,5 +1,45 @@
 # Execution Log
 
+## 2026-08-17 - Sanitized GitHub Publication
+
+### Publication
+
+- Rotated the affected local MySQL development credential without printing either the
+  previous or replacement value; the replacement was verified, the previous local
+  configuration no longer authenticates, and the MySQL service returned to stopped.
+- Replaced public `main` with sanitized root commit
+  `405404f3dc3643791796afd0bc4c59f571e38d06`; no public branch or tag points to the
+  previous root history.
+- GitHub Actions run
+  [32010200396](https://github.com/linjialiang0814/MyAI/actions/runs/32010200396)
+  passed all four jobs: static quality gates, Python 3.12 tests, Java 17 verify, and
+  portable artifact build/verification/controls.
+- Published prerelease
+  [v0.11.0-local](https://github.com/linjialiang0814/MyAI/releases/tag/v0.11.0-local)
+  with the 90,342,148-byte Windows ZIP and its SHA-256 file. GitHub reports the ZIP
+  digest as `b8321035fbd6858ec24ae3f6c3cd197019a61064f23c60a0b311cf6c9aa3aa7c`.
+
+### Repository Governance
+
+- Added the public repository description and ten focused technology topics.
+- Enabled secret scanning, push protection, Dependabot alerts/security updates, and
+  private vulnerability reporting. The sanitized reachable history has zero open
+  secret-scanning alerts.
+- Protected `main`: pull requests, four required checks, linear history, resolved
+  conversations, and admin enforcement are required; force pushes and deletion are
+  disabled.
+- Dependabot's first activation created duplicate branch `push` and `pull_request`
+  jobs. Redundant non-main runs were cancelled, and CI now limits `push` execution to
+  `main` while retaining pull-request validation.
+
+### Remaining External Boundary
+
+- GitHub still resolves the former commit by direct SHA even though no branch or tag
+  references it. The credential is no longer valid, but GitHub Support cache cleanup
+  remains the final historical-hygiene action.
+- The repository remains intentionally unlicensed until the owner explicitly chooses
+  MIT, Apache-2.0, or retained rights.
+
 ## 2026-08-17 - Public Repository Readiness Checkpoint
 
 ### Changes
