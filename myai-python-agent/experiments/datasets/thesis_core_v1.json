@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "dataset_id": "myai-thesis-core-v1-r2",
+  "description": "Synthetic bilingual memory and RAG cases for controlled MyAI graduation-thesis ablations. Revision 2 fixes objective gold annotations found by the mandatory pre-publication raw-output audit.",
+  "memory_cases": [
+    {
+      "id": "mem_stable_major",
+      "category": "stable_fact",
+      "language": "en",
+      "observations": [
+        {"id": "major_current", "content": "my major is computer science", "mem_type": "fact", "slot": "major", "value": "computer science", "confidence": 0.95, "importance": 5}
+      ],
+      "query": "What is my major?",
+      "expected": {"accepted_answers": ["computer science", "cs", "computer science (cs)", "计算机科学"], "evidence_groups": [["major_current"]]}
+    },
+    {
+      "id": "mem_stable_name",
+      "category": "stable_fact",
+      "language": "zh",
+      "observations": [
+        {"id": "name_current", "content": "my name is Lin", "mem_type": "fact", "slot": "name", "value": "lin", "confidence": 0.97, "importance": 5}
+      ],
+      "query": "我的名字是什么？",
+      "expected": {"accepted_answers": ["lin"], "evidence_groups": [["name_current"]]}
+    },
+    {
+      "id": "mem_stable_job",
+      "category": "stable_fact",
+      "language": "en",
+      "observations": [
+        {"id": "job_current", "content": "my job is data engineer", "mem_type": "fact", "slot": "job", "value": "data engineer", "confidence": 0.95, "importance": 5}
+      ],
+      "query": "What is my job?",
+      "expected": {"accepted_answers": ["data engineer", "数据工程师"], "evidence_groups": [["job_current"]]}
+    },
+    {
+      "id": "mem_location_update",
+      "category": "temporal_update",
+      "language": "en",
+      "observations": [
+        {"id": "location_old", "content": "I live in Suzhou", "mem_type": "fact", "slot": "location", "value": "suzhou", "confidence": 0.94, "importance": 5},
+        {"id": "location_current", "content": "I moved to Nanjing", "mem_type": "fact", "slot": "location", "value": "nanjing", "confidence": 0.97, "importance": 5, "metadata": {"update_intent": "correction"}}
+      ],
+      "query": "Where do I live now?",
+      "expected": {"accepted_answers": ["nanjing", "南京"], "forbidden_terms": ["suzhou"], "evidence_groups": [["location_current"]], "forbidden_evidence_ids": ["location_old"]}
+    },
+    {
+      "id": "mem_major_update",
+      "category": "temporal_update",
+      "language": "zh",
+      "observations": [
+        {"id": "major_old", "content": "my major is chemistry", "mem_type": "fact", "slot": "major", "value": "chemistry", "confidence": 0.94, "importance": 5},
+        {"id": "major_new", "content": "Actually, my major is artificial intelligence", "mem_type": "fact", "slot": "major", "value": "artificial intelligence", "confidence": 0.97, "importance": 5, "metadata": {"update_intent": "correction"}}
+      ],
+      "query": "我现在的专业是什么？",
+      "expected": {"accepted_answers": ["artificial intelligence", "ai", "人工智能"], "forbidden_terms": ["chemistry", "化学"], "evidence_groups": [["major_new"]], "forbidden_evidence_ids": ["major_old"]}
+    },
+    {
+      "id": "mem_duplicate_major",
+      "category": "deduplication",
+      "language": "en",
+      "observations": [
+        {"id": "major_full", "content": "my major is computer science", "mem_type": "fact", "slot": "major", "value": "computer science", "confidence": 0.95, "importance": 5},
+        {"id": "major_alias", "content": "my major is CS", "mem_type": "fact", "slot": "major", "value": "computer science", "confidence": 0.95, "importance": 5}
+      ],
+      "query": "Which subject do I study?",
+      "expected": {"accepted_answers": ["computer science", "cs", "computer science (cs)", "计算机科学"], "evidence_groups": [["major_full", "major_alias"]]}
+    },
+    {
+      "id": "mem_single_preference",
+      "category": "preference",
+      "language": "zh",
+      "observations": [
+        {"id": "pref_python", "content": "I like Python", "mem_type": "preference", "slot": "preference", "value": "python", "confidence": 0.94, "importance": 5}
+      ],
+      "query": "我喜欢哪种编程语言？",
+      "expected": {"accepted_answers": ["python"], "evidence_groups": [["pref_python"]]}
+    },
+    {
+      "id": "mem_multi_preference",
+      "category": "multi_value",
+      "language": "en",
+      "observations": [
+        {"id": "pref_python_multi", "content": "I like Python", "mem_type": "preference", "slot": "preference", "value": "python", "confidence": 0.94, "importance": 5},
+        {"id": "pref_rust_multi", "content": "I like Rust", "mem_type": "preference", "slot": "preference", "value": "rust", "confidence": 0.94, "importance": 5}
+      ],
+      "query": "Which programming languages do I like?",
+      "expected": {"accepted_answers": ["python and rust", "rust and python", "python, rust", "rust, python", "python & rust", "rust & python", "python、rust", "rust、python", "python和rust", "rust和python"], "evidence_groups": [["pref_python_multi"], ["pref_rust_multi"]]}
+    },
+    {
+      "id": "mem_negated_preference",
+      "category": "negation",
+      "language": "en",
+      "observations": [
+        {"id": "coffee_old", "content": "I like coffee", "mem_type": "preference", "slot": "preference", "value": "coffee", "confidence": 0.94, "importance": 5},
+        {"id": "coffee_negation", "content": "I no longer like coffee", "mem_type": "preference", "slot": "preference", "value": "coffee", "confidence": 0.97, "importance": 5, "metadata": {"update_intent": "negation"}}
+      ],
+      "query": "What is my current confirmed drink preference?",
+      "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"], "evidence_groups": [], "forbidden_evidence_ids": ["coffee_old", "coffee_negation"]}
+    },
+    {
+      "id": "mem_secret_rejection",
+      "category": "sensitive_governance",
+      "language": "en",
+      "observations": [
+        {"id": "secret_password", "content": "my password is ZETA-991", "mem_type": "fact", "slot": "secret", "value": "zeta-991", "confidence": 0.99, "importance": 5}
+      ],
+      "query": "What is my password?",
+      "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"], "forbidden_terms": ["zeta-991"], "evidence_groups": [], "forbidden_evidence_ids": ["secret_password"]}
+    },
+    {
+      "id": "mem_personal_sensitive_pending",
+      "category": "sensitive_governance",
+      "language": "zh",
+      "observations": [
+        {"id": "sensitive_id", "content": "my id card number is PX-2048-771", "mem_type": "fact", "slot": "document", "value": "px-2048-771", "confidence": 0.96, "importance": 5}
+      ],
+      "query": "我的身份证编号是什么？",
+      "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"], "forbidden_terms": ["px-2048-771"], "evidence_groups": [], "forbidden_evidence_ids": ["sensitive_id"]}
+    },
+    {
+      "id": "mem_low_confidence_pending",
+      "category": "review_queue",
+      "language": "en",
+      "observations": [
+        {"id": "uncertain_theme", "content": "I may prefer the ultraviolet theme", "mem_type": "preference", "slot": "preference", "value": "ultraviolet theme", "confidence": 0.48, "importance": 3}
+      ],
+      "query": "What is my confirmed interface theme?",
+      "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"], "forbidden_terms": ["ultraviolet"], "evidence_groups": [], "forbidden_evidence_ids": ["uncertain_theme"]}
+    },
+    {
+      "id": "mem_conversation_scope_match",
+      "category": "scope",
+      "language": "en",
+      "observations": [
+        {"id": "scoped_code_match", "content": "the temporary review code is COBALT-314", "mem_type": "fact", "slot": "general", "value": "cobalt-314", "confidence": 0.95, "importance": 5, "conversation_id": 13, "metadata": {"scope": "conversation"}}
+      ],
+      "query": "What is the temporary review code?",
+      "conversation_id": 13,
+      "expected": {"accepted_answers": ["cobalt-314"], "evidence_groups": [["scoped_code_match"]]}
+    },
+    {
+      "id": "mem_conversation_scope_mismatch",
+      "category": "scope",
+      "language": "zh",
+      "observations": [
+        {"id": "scoped_code_hidden", "content": "the temporary review code is INDIGO-271", "mem_type": "fact", "slot": "general", "value": "indigo-271", "confidence": 0.95, "importance": 5, "conversation_id": 14, "metadata": {"scope": "conversation"}}
+      ],
+      "query": "临时审核码是什么？",
+      "conversation_id": 15,
+      "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"], "forbidden_terms": ["indigo-271"], "evidence_groups": [], "forbidden_evidence_ids": ["scoped_code_hidden"]}
+    },
+    {
+      "id": "mem_decision",
+      "category": "decision",
+      "language": "en",
+      "observations": [
+        {"id": "decision_architecture", "content": "I decided to use a dual-service architecture", "mem_type": "decision", "slot": "decision", "value": "dual-service architecture", "confidence": 0.95, "importance": 5}
+      ],
+      "query": "Which architecture did I decide to use?",
+      "expected": {"accepted_answers": ["dual-service", "dual service", "dual-service architecture", "dual service architecture", "two-service architecture", "two service architecture", "双服务架构"], "evidence_groups": [["decision_architecture"]]}
+    },
+    {
+      "id": "mem_no_relevant_fact",
+      "category": "no_answer",
+      "language": "en",
+      "observations": [
+        {"id": "noise_major", "content": "my major is computer science", "mem_type": "fact", "slot": "major", "value": "computer science", "confidence": 0.95, "importance": 5},
+        {"id": "noise_job", "content": "my job is data engineer", "mem_type": "fact", "slot": "job", "value": "data engineer", "confidence": 0.95, "importance": 5}
+      ],
+      "query": "What is my favorite telescope brand?",
+      "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"], "evidence_groups": [], "forbidden_evidence_ids": ["noise_major", "noise_job"]}
+    },
+    {
+      "id": "mem_job_update",
+      "category": "temporal_update",
+      "language": "zh",
+      "observations": [
+        {"id": "job_old", "content": "my job is tester", "mem_type": "fact", "slot": "job", "value": "tester", "confidence": 0.94, "importance": 5},
+        {"id": "job_new", "content": "Actually, my job is backend engineer", "mem_type": "fact", "slot": "job", "value": "backend engineer", "confidence": 0.97, "importance": 5, "metadata": {"update_intent": "correction"}}
+      ],
+      "query": "我现在的工作是什么？",
+      "expected": {"accepted_answers": ["backend engineer", "back-end engineer", "后端工程师", "后端开发工程师", "后端开发"], "forbidden_terms": ["tester", "测试员", "测试工程师"], "evidence_groups": [["job_new"]], "forbidden_evidence_ids": ["job_old"]}
+    },
+    {
+      "id": "mem_distractor_volume",
+      "category": "distractors",
+      "language": "en",
+      "observations": [
+        {"id": "noise_location", "content": "I live in Hangzhou", "mem_type": "fact", "slot": "location", "value": "hangzhou", "confidence": 0.95, "importance": 5},
+        {"id": "noise_major_two", "content": "my major is computer science", "mem_type": "fact", "slot": "major", "value": "computer science", "confidence": 0.95, "importance": 5},
+        {"id": "noise_job_two", "content": "my job is data engineer", "mem_type": "fact", "slot": "job", "value": "data engineer", "confidence": 0.95, "importance": 5},
+        {"id": "target_editor", "content": "I prefer the Helix editor", "mem_type": "preference", "slot": "preference", "value": "helix editor", "confidence": 0.95, "importance": 5},
+        {"id": "noise_decision", "content": "I decided to write tests first", "mem_type": "decision", "slot": "decision", "value": "write tests first", "confidence": 0.95, "importance": 5}
+      ],
+      "query": "Which code editor do I prefer?",
+      "expected": {"accepted_answers": ["helix", "helix editor"], "evidence_groups": [["target_editor"]]}
+    }
+  ],
+  "rag_documents": [
+    {
+      "alias": "architecture",
+      "file_name": "01_architecture.txt",
+      "content": "MyAI uses a two-service architecture. The Java Spring Boot application owns login, sessions, CSRF protection, user identity, conversation persistence, and the browser workbench. The Python FastAPI service owns agent orchestration, memory, knowledge retrieval, task planning, and tool execution. The internal Python endpoint uses port 8000. The synthetic architecture review codename is GATE-LANTERN.\n\nThe service boundary is deliberately narrow. Java never executes model tools directly, and Python does not accept browser identity as a trusted user id. Requests cross the boundary through a typed internal API. Conversation ownership remains in Java, while agent execution state remains in Python. A health endpoint may mention both login and planning, but that endpoint does not own either responsibility.\n\nAn abandoned monolith draft used port 7001 and placed session handling beside tool execution. That draft is retained here as a hard negative and is not the approved architecture. The approved design is the two-service Java and Python split described above. Operators should not infer ownership merely from a component name or from this historical port."
+    },
+    {
+      "alias": "aster_release",
+      "file_name": "02_aster_release.txt",
+      "content": "Project Aster has deployment code ZXQ9000. Its approved deployment window is Friday at 21:30 China Standard Time. The rollback code is ROL-771, and the release owner is Lin. Deployment must stop if the health probe is degraded. These values are the signed production record.\n\nA rehearsal worksheet is intentionally similar but obsolete. It calls the project Aster, proposes Monday at 08:00, lists temporary code PXQ100, and names Chen as an observer. None of those rehearsal values are approved for Aster production. The worksheet exists to test whether retrieval favors repeated lexical overlap over the authoritative record.\n\nDuring deployment, the operator first checks the health probe, then verifies the release owner and approved window. If the probe is degraded, the run stops before any migration. ROL-771 is used only after a failed production change; it is not the Phoenix rollback code. The exact code ZXQ9000 and the Friday window must remain linked to the signed record rather than the rehearsal paragraph."
+    },
+    {
+      "alias": "phoenix_release",
+      "file_name": "03_phoenix_release.txt",
+      "content": "Project Phoenix is a separate distractor project. Its deployment code is PXQ100. Phoenix deploys on Monday at 08:00 China Standard Time, uses rollback code ROL-119, and is owned by Chen.\n\nPhoenix documentation repeatedly mentions Aster because both releases share a checklist template. Those mentions do not transfer Aster's code, owner, Friday window, or rollback value to Phoenix. A copied note containing ZXQ9000 is marked invalid. The authoritative Phoenix values remain PXQ100, Monday at 08:00, ROL-119, and Chen.\n\nThe release team uses this near-duplicate record to test lexical hard negatives. A query containing deployment, rollback, owner, or project may match both files, so the selected passage must preserve the project name and its associated values."
+    },
+    {
+      "alias": "memory_governance",
+      "file_name": "04_memory_governance.txt",
+      "content": "Governed memory classifies candidates as accepted, pending, or rejected. Secret-like values are rejected from retrieval. A secret is never made available merely because its embedding is highly similar to a query. Rejected candidates remain auditable but are not eligible context.\n\nLow-confidence and sensitive personal candidates remain pending for review. Pending is different from rejected: a user may later approve a pending personal value, while a secret-like value stays blocked by policy. A high-confidence ordinary preference may be accepted immediately. These distinctions form a lexical hard negative because all three statuses appear in the same document.\n\nA single-value fact such as location supersedes its previous current value. The old fact may remain in history with is_current false, but retrieval should favor only the active value. Duplicate canonical values can merge, and an explicit negation can disable an earlier preference.\n\nThe context selector returns at most three memories. It ranks eligible candidates after scope, review, sensitivity, temporal state, confidence, and similarity checks. The three-item limit applies to selected context, not to the larger candidate pool inspected before governance."
+    },
+    {
+      "alias": "rag_design",
+      "file_name": "05_rag_design.txt",
+      "content": "The MyAI knowledge path supports vector candidates and keyword candidates. Hybrid retrieval fuses vector, lexical, filename, recency, and file-filter signals. Pure vector retrieval does not call the keyword candidate path. Hybrid without reranking preserves the first-stage fusion order under the same selected-context budget.\n\nThe lightweight reranker computes 0.72 times retrieval score plus 0.20 times query coverage plus 0.08 times length quality, then subtracts duplicate and diversity penalties. It is a rule reranker, not a cross-encoder. Duplicate penalties discourage nearly repeated passages, and file diversity prevents every selected chunk from coming from one source when alternatives are useful.\n\nA deprecated prototype used weights 0.60, 0.30, and 0.10 and was sometimes described as a neural reranker. That description and those weights are intentionally retained as hard negatives; they are not the current implementation. The current deterministic rule remains 0.72, 0.20, and 0.08.\n\nReranking receives the same hybrid candidate pool as the non-reranked arm. It may change final order and selected chunks, but it must not silently add another retrieval source. This separation lets the benchmark attribute hybrid-versus-rerank differences to final selection rather than corpus changes."
+    },
+    {
+      "alias": "experiment_protocol",
+      "file_name": "06_experiment_protocol.txt",
+      "content": "The frozen thesis experiment uses random seed 42, temperature zero, Top-K equal to three, and three measured repetitions after one warm-up request. The primary metrics are rubric answer accuracy, generated citation hit rate, supporting-evidence hit, latency, resource usage, and failure rate. Stub fallback is prohibited in publishable runs.\n\nThe three repetitions are technical repeats. They measure output consistency and runtime variation but do not triple the number of independent benchmark questions. Variant order follows a committed balanced rotation so each arm occupies each order position once. Accuracy deltas use paired unique cases and deterministic bootstrap intervals.\n\nEvery publishable run requires the full frozen dataset, both experiment suites, exact model digests, exact environment checks, and a clean Git commit observed before artifact creation. Diagnostic pilots may use fewer cases but must remain non-publishable."
+    },
+    {
+      "alias": "hardware",
+      "file_name": "07_hardware.txt",
+      "content": "The fixed experiment machine uses a 12th Gen Intel Core i7-12700H with 14 physical cores and 20 logical processors. It has 15.8 GiB of system RAM and an NVIDIA GeForce RTX 3050 Laptop GPU with 4096 MiB VRAM. The recorded NVIDIA driver is 546.30."
+    },
+    {
+      "alias": "privacy",
+      "file_name": "08_privacy.txt",
+      "content": "The safe local baseline binds services to 127.0.0.1. The filesystem connector is disabled by default and requires explicit narrow roots before use. User identity is derived by the Java layer, and absolute local paths are redacted from normal connector responses."
+    },
+    {
+      "alias": "checkpoint",
+      "file_name": "09_checkpoint.txt",
+      "content": "The synthetic release checkpoint is named AMBER-CHECKPOINT. It requires four gates: all Python tests pass, all Java tests pass, the root release smoke passes, and the staged diff contains no credential material. Runtime databases, uploaded files, model weights, and personal logs are excluded."
+    },
+    {
+      "alias": "assistant_profile",
+      "file_name": "10_assistant_profile.txt",
+      "content": "The demonstration user prefers concise Chinese answers, uses the Helix editor, and calls the assistant Mica. These are synthetic benchmark facts. The preferred daily summary time is 18:40, and the summary format is a three-item bullet list."
+    }
+  ],
+  "rag_cases": [
+    {"id": "rag_architecture_java", "category": "semantic", "language": "en", "query": "Which service owns login and sessions?", "gold_file_aliases": ["architecture"], "gold_content_anchors": ["Java Spring Boot application owns login"], "expected": {"required_terms": ["java"]}},
+    {"id": "rag_architecture_python", "category": "semantic", "language": "zh", "query": "哪个服务负责任务规划和工具执行？", "gold_file_aliases": ["architecture"], "gold_content_anchors": ["Python FastAPI service owns agent orchestration"], "expected": {"required_terms": ["python"]}},
+    {"id": "rag_architecture_port", "category": "exact_entity", "language": "en", "query": "What port is used by the internal Python endpoint?", "gold_file_aliases": ["architecture"], "gold_content_anchors": ["port 8000"], "expected": {"required_terms": ["8000"]}},
+    {"id": "rag_architecture_codename", "category": "exact_code", "language": "en", "query": "What is the architecture review codename?", "gold_file_aliases": ["architecture"], "gold_content_anchors": ["GATE-LANTERN"], "expected": {"required_term_groups": [["gate-lantern", "gate lantern"]]}},
+    {"id": "rag_aster_code", "category": "exact_code", "language": "en", "query": "ZXQ9000 belongs to which project?", "gold_file_aliases": ["aster_release"], "gold_content_anchors": ["Project Aster has deployment code ZXQ9000", "The exact code ZXQ9000"], "expected": {"required_terms": ["aster"]}},
+    {"id": "rag_aster_window", "category": "distractor", "language": "en", "query": "When is Project Aster deployed?", "gold_file_aliases": ["aster_release"], "gold_content_anchors": ["Friday at 21:30"], "expected": {"required_term_groups": [["friday"], ["21:30", "9:30 pm", "9:30 p.m."]], "forbidden_terms": ["monday", "08:00"]}},
+    {"id": "rag_aster_rollback", "category": "exact_code", "language": "zh", "query": "Aster 的回滚代码是什么？", "gold_file_aliases": ["aster_release"], "gold_content_anchors": ["rollback code is ROL-771", "ROL-771 is used only after a failed production change"], "expected": {"required_terms": ["rol-771"], "forbidden_terms": ["rol-119"]}},
+    {"id": "rag_aster_owner", "category": "entity", "language": "en", "query": "Who owns the Aster release?", "gold_file_aliases": ["aster_release"], "gold_content_anchors": ["release owner is Lin"], "expected": {"required_terms": ["lin"], "forbidden_terms": ["chen"]}},
+    {"id": "rag_aster_stop_condition", "category": "hard_negative", "language": "en", "query": "When must the Aster deployment stop?", "gold_file_aliases": ["aster_release"], "gold_content_anchors": ["Deployment must stop if the health probe is degraded", "If the probe is degraded, the run stops before any migration"], "expected": {"required_terms": ["health probe", "degraded"]}},
+    {"id": "rag_phoenix_window", "category": "distractor", "language": "zh", "query": "Phoenix 项目何时部署？", "gold_file_aliases": ["phoenix_release"], "gold_content_anchors": ["Monday at 08:00"], "expected": {"required_term_groups": [["monday", "周一", "星期一"], ["08:00", "8:00", "8:00 am", "8 am", "八点", "8点"]], "forbidden_terms": ["friday", "周五", "星期五", "21:30", "deployment code is rol-119", "rol-119 deployment code", "部署代码是 rol-119"]}},
+    {"id": "rag_memory_secret", "category": "semantic", "language": "en", "query": "How does governed memory handle secret-like values?", "gold_file_aliases": ["memory_governance"], "gold_content_anchors": ["Secret-like values are rejected"], "expected": {"required_term_groups": [["rejected", "rejects", "blocked"]], "forbidden_terms": ["not rejected", "isn't rejected", "not blocked", "is accepted by policy", "are accepted by policy", "can be accepted by policy", "but accepted by policy"]}},
+    {"id": "rag_memory_pending", "category": "semantic", "language": "zh", "query": "哪些记忆候选会进入 pending 审核？", "gold_file_aliases": ["memory_governance"], "gold_content_anchors": ["Low-confidence and sensitive personal candidates remain pending"], "expected": {"required_term_groups": [["low-confidence", "low confidence", "低置信度"], ["sensitive", "敏感个人", "敏感信息", "敏感"]]}},
+    {"id": "rag_memory_limit", "category": "exact_number", "language": "en", "query": "How many memories can enter context at most?", "gold_file_aliases": ["memory_governance"], "gold_content_anchors": ["at most three memories"], "expected": {"required_term_groups": [["three", "3"]]}},
+    {"id": "rag_hybrid_signals", "category": "multi_fact", "language": "en", "query": "Which signals are fused by hybrid retrieval?", "gold_file_aliases": ["rag_design"], "gold_content_anchors": ["fuses vector, lexical, filename, recency, and file-filter signals"], "expected": {"required_term_groups": [["vector"], ["lexical", "keyword"], ["filename", "file name"], ["recency"], ["file-filter", "file filter"]]}},
+    {"id": "rag_rerank_weights", "category": "hard_negative", "language": "en", "query": "What are the three current positive reranker weights?", "gold_file_aliases": ["rag_design"], "gold_content_anchors": ["0.72 times retrieval score plus 0.20 times query coverage plus 0.08 times length quality", "The current deterministic rule remains 0.72, 0.20, and 0.08"], "expected": {"required_terms": ["0.72", "0.20", "0.08"], "forbidden_terms": ["0.60", "0.30", "0.10"]}},
+    {"id": "rag_rerank_type", "category": "semantic", "language": "en", "query": "Is the current reranker a cross-encoder?", "gold_file_aliases": ["rag_design"], "gold_content_anchors": ["rule reranker, not a cross-encoder"], "expected": {"accepted_answers": ["no"], "required_term_groups": [["not a cross-encoder", "not a cross encoder", "rule reranker", "rule-based reranker", "rule based reranker", "deterministic rule reranker"]], "forbidden_terms": ["is a cross-encoder", "is a cross encoder", "neural reranker", "not a rule reranker", "isn't a rule reranker", "is not a rule reranker"]}},
+    {"id": "rag_experiment_seed", "category": "exact_number", "language": "zh", "query": "毕业设计实验固定的随机种子是多少？", "gold_file_aliases": ["experiment_protocol"], "gold_content_anchors": ["random seed 42"], "expected": {"required_term_groups": [["42", "四十二"]]}},
+    {"id": "rag_experiment_repeats", "category": "exact_number", "language": "en", "query": "How many measured technical repetitions are required?", "gold_file_aliases": ["experiment_protocol"], "gold_content_anchors": ["three measured repetitions"], "expected": {"required_term_groups": [["three", "3"]]}},
+    {"id": "rag_experiment_fallback", "category": "policy", "language": "en", "query": "Can a publishable run use Stub fallback?", "gold_file_aliases": ["experiment_protocol"], "gold_content_anchors": ["Stub fallback is prohibited"], "expected": {"accepted_answers": ["no"], "required_term_groups": [["prohibited", "forbidden", "not allowed", "must not", "cannot", "can't"]], "forbidden_terms": ["not prohibited", "not forbidden", "fallback is allowed", "fallback is permitted", "can use stub fallback", "may use stub fallback"]}},
+    {"id": "rag_hardware_gpu", "category": "exact_entity", "language": "en", "query": "Which GPU is installed in the fixed environment?", "gold_file_aliases": ["hardware"], "gold_content_anchors": ["NVIDIA GeForce RTX 3050 Laptop GPU"], "expected": {"required_terms": ["rtx 3050"]}},
+    {"id": "rag_hardware_memory", "category": "exact_number", "language": "zh", "query": "固定实验机器有多少系统内存和显存？", "gold_file_aliases": ["hardware"], "gold_content_anchors": ["15.8 GiB of system RAM", "4096 MiB VRAM"], "gold_evidence": [{"file_alias": "hardware", "anchors": ["15.8 GiB of system RAM", "4096 MiB VRAM"], "match": "all"}], "expected": {"required_term_groups": [["15.8"], ["4096", "4 gib", "4 gb", "4gb"]]}},
+    {"id": "rag_baseline_seed_gpu", "category": "multi_document", "language": "en", "query": "What random seed and installed GPU identify the frozen baseline?", "gold_file_aliases": ["experiment_protocol", "hardware"], "gold_evidence": [{"file_alias": "experiment_protocol", "anchors": ["random seed 42"], "match": "all"}, {"file_alias": "hardware", "anchors": ["NVIDIA GeForce RTX 3050 Laptop GPU"], "match": "all"}], "expected": {"required_terms": ["42", "rtx 3050"]}},
+    {"id": "rag_privacy_bind", "category": "exact_entity", "language": "en", "query": "What address does the safe local baseline bind to?", "gold_file_aliases": ["privacy"], "gold_content_anchors": ["binds services to 127.0.0.1"], "expected": {"required_terms": ["127.0.0.1"]}},
+    {"id": "rag_privacy_filesystem", "category": "policy", "language": "zh", "query": "文件系统连接器默认是否启用？", "gold_file_aliases": ["privacy"], "gold_content_anchors": ["filesystem connector is disabled by default"], "expected": {"required_term_groups": [["disabled", "not enabled", "禁用", "未启用"]], "forbidden_terms": ["not disabled", "is enabled by default", "默认启用", "未禁用"]}},
+    {"id": "rag_checkpoint_name", "category": "exact_code", "language": "en", "query": "What is the synthetic release checkpoint called?", "gold_file_aliases": ["checkpoint"], "gold_content_anchors": ["AMBER-CHECKPOINT"], "expected": {"required_term_groups": [["amber-checkpoint", "amber checkpoint"]]}},
+    {"id": "rag_profile_summary_time", "category": "exact_time", "language": "zh", "query": "演示用户希望每天几点收到摘要？", "gold_file_aliases": ["assistant_profile"], "gold_content_anchors": ["daily summary time is 18:40"], "expected": {"required_term_groups": [["18:40", "6:40 pm", "6:40 p.m.", "十八点四十分", "下午六点四十分"]]}},
+    {"id": "rag_no_answer_budget", "category": "no_answer", "language": "en", "query": "What is the budget for the Mars colony?", "gold_file_aliases": [], "gold_content_anchors": [], "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"]}},
+    {"id": "rag_no_answer_database", "category": "no_answer", "language": "en", "query": "Which PostgreSQL version runs in production?", "gold_file_aliases": [], "gold_content_anchors": [], "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"]}},
+    {"id": "rag_no_answer_mobile", "category": "no_answer", "language": "zh", "query": "移动客户端支持哪个最低系统版本？", "gold_file_aliases": [], "gold_content_anchors": [], "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"]}},
+    {"id": "rag_no_answer_rate_limit", "category": "no_answer", "language": "en", "query": "What is the production API rate limit per minute?", "gold_file_aliases": [], "gold_content_anchors": [], "expected": {"abstain": true, "accepted_answers": ["UNKNOWN"]}}
+  ]
+}

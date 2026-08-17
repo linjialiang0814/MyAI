@@ -1,0 +1,164 @@
+{
+  "cases": [
+    {
+      "id": "upload_parse_success",
+      "type": "upload",
+      "files": [
+        {
+          "alias": "ml",
+          "file_name": "ml_notes.txt",
+          "content": "机器学习是一门研究如何让计算机从数据中学习的学科。"
+        }
+      ],
+      "expect": {
+        "ingestion_status": "indexed",
+        "profile": true,
+        "min_chunk_count": 1
+      }
+    },
+    {
+      "id": "duplicate_detection",
+      "type": "duplicate",
+      "files": [
+        {
+          "alias": "original",
+          "file_name": "duplicate_original.txt",
+          "content": "重复文件内容，用于检测 content hash。"
+        },
+        {
+          "alias": "copy",
+          "file_name": "duplicate_copy.txt",
+          "content": "重复文件内容，用于检测 content hash。"
+        }
+      ],
+      "expect": {
+        "duplicate": true
+      }
+    },
+    {
+      "id": "exact_keyword_retrieval",
+      "type": "query",
+      "files": [
+        {
+          "alias": "noise",
+          "file_name": "background.txt",
+          "content": "普通背景文档，用于制造候选池噪声。"
+        },
+        {
+          "alias": "target",
+          "file_name": "keyword_note.txt",
+          "content": "项目代号 ZXQ9000 的部署窗口是周五晚上。"
+        }
+      ],
+      "query": "ZXQ9000",
+      "top_k": 1,
+      "expect": {
+        "file_alias": "target",
+        "hit_at_k": 1,
+        "retrieval_mode_contains": "keyword",
+        "citation_complete": true
+      }
+    },
+    {
+      "id": "semantic_retrieval",
+      "type": "query",
+      "files": [
+        {
+          "alias": "target",
+          "file_name": "agent_runtime.txt",
+          "content": "Automated planning coordinates tools, workflows, and memories for reliable agent execution."
+        },
+        {
+          "alias": "other",
+          "file_name": "cooking.txt",
+          "content": "Pasta recipes require water, salt, and careful timing."
+        }
+      ],
+      "query": "orchestration",
+      "top_k": 1,
+      "expect": {
+        "file_alias": "target",
+        "hit_at_k": 1,
+        "retrieval_mode_contains": "vector",
+        "citation_complete": true
+      }
+    },
+    {
+      "id": "file_filtered_retrieval",
+      "type": "query",
+      "files": [
+        {
+          "alias": "selected",
+          "file_name": "selected_doc.txt",
+          "content": "项目 Phoenix 的上线窗口是周五晚上。"
+        },
+        {
+          "alias": "other",
+          "file_name": "other_doc.txt",
+          "content": "项目 Phoenix 的上线窗口是周一早上。"
+        }
+      ],
+      "query": "Phoenix 的上线窗口是什么时候？",
+      "top_k": 3,
+      "file_filter_alias": "selected",
+      "expect": {
+        "file_alias": "selected",
+        "all_hits_file_alias": "selected",
+        "hit_at_k": 1,
+        "citation_complete": true
+      }
+    },
+    {
+      "id": "citation_fields",
+      "type": "query",
+      "files": [
+        {
+          "alias": "target",
+          "file_name": "citation_doc.txt",
+          "content": "Citation audit requires file id, chunk id, character span, snippet, and score."
+        }
+      ],
+      "query": "citation audit snippet score",
+      "top_k": 1,
+      "expect": {
+        "file_alias": "target",
+        "citation_complete": true
+      }
+    },
+    {
+      "id": "no_answer_insufficient_evidence",
+      "type": "qa",
+      "files": [
+        {
+          "alias": "target",
+          "file_name": "ml_doc.txt",
+          "content": "机器学习是一门研究如何让计算机从数据中学习的学科。"
+        }
+      ],
+      "question": "火星基地的预算是多少？",
+      "file_filter_alias": "target",
+      "expect": {
+        "answer_status": "not_enough_evidence",
+        "evidence_count": 0
+      }
+    },
+    {
+      "id": "chinese_english_mixed_query",
+      "type": "query",
+      "files": [
+        {
+          "alias": "target",
+          "file_name": "myai_hybrid.txt",
+          "content": "MyAI 知识库 uses hybrid retrieval to combine vector search and keyword 检索。"
+        }
+      ],
+      "query": "MyAI hybrid 检索",
+      "top_k": 1,
+      "expect": {
+        "file_alias": "target",
+        "hit_at_k": 1,
+        "citation_complete": true
+      }
+    }
+  ]
+}

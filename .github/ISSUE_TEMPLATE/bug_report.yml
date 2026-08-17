@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a reproducible problem in the local MyAI application.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve MyAI. Remove passwords, tokens, private documents, usernames, and machine-specific paths from logs before submitting.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I removed secrets and personal data from this report and its attachments.
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: MyAI version or commit
+      placeholder: 0.11.0-local or commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: startup
+    attributes:
+      label: Startup mode
+      options:
+        - Portable Windows package
+        - Source checkout with stub provider
+        - Source checkout with Ollama
+        - Other local provider
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include OS, Java, Python, Ollama/provider version, model names, and relevant hardware. Do not include personal paths.
+      placeholder: Windows 11; Java 17; Python 3.12; Ollama 0.x; CPU-only
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start ...
+        2. Open ...
+        3. Submit ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and redacted logs
+      description: Paste the smallest useful excerpt. Redact secrets and personal data.
+    validations:
+      required: true

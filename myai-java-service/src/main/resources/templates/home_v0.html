@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>主页</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h2>欢迎, <span th:text="${user.username}"></span>!</h2>
+    <p>你的邮箱：<span th:text="${user.email}"></span></p>
+    <p>注册时间：<span th:text="${#temporals.format(user.createTime, 'yyyy-MM-dd HH:mm')}"></span></p>
+    <a th:href="@{/logout}">注销</a>
+</div>
+</body>
+</html>

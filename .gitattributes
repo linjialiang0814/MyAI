@@ -1,0 +1,6 @@
+# Keep reproducibility-critical experiment contracts byte-identical across platforms.
+myai-python-agent/experiments/**/*.json text eol=lf
+myai-python-agent/experiments/**/*.md text eol=lf
+reports/experiments/** text eol=lf
+# Generated reports are committed byte-for-byte with their recorded checksum.
+reports/experiments/**/report.md whitespace=-blank-at-eof

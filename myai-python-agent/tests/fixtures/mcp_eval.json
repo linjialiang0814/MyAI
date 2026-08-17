@@ -1,0 +1,113 @@
+{
+  "cases": [
+    {
+      "id": "descriptor_schema_conversion",
+      "type": "descriptor",
+      "expect": {
+        "registry_name": "mcp__mock_server__echo_text",
+        "required": ["text"],
+        "risk_level": "safe"
+      }
+    },
+    {
+      "id": "read_only_policy_mapping",
+      "type": "policy",
+      "descriptor": {
+        "server_id": "mock-server",
+        "name": "read_notes",
+        "description": "Read notes.",
+        "annotations": {
+          "readOnlyHint": true
+        }
+      },
+      "expect": {
+        "risk_level": "filesystem/read",
+        "requires_confirmation": false,
+        "allowed_in_hosted": true
+      }
+    },
+    {
+      "id": "destructive_policy_blocks_hosted",
+      "type": "policy",
+      "descriptor": {
+        "server_id": "mock-server",
+        "name": "delete_notes",
+        "description": "Delete notes.",
+        "retry_count": 2,
+        "annotations": {
+          "destructiveHint": true
+        }
+      },
+      "expect": {
+        "risk_level": "destructive",
+        "requires_confirmation": true,
+        "allowed_in_hosted": false,
+        "retry_count": 0
+      }
+    },
+    {
+      "id": "filesystem_connector_health",
+      "type": "connector_health",
+      "expect": {
+        "enabled": true,
+        "health_ok": true,
+        "tool_count": 3,
+        "risk_level": "filesystem/read"
+      }
+    },
+    {
+      "id": "filesystem_read_execution_trace",
+      "type": "execution_trace",
+      "tool_name": "mcp__filesystem_readonly__read_text",
+      "tool_args": {
+        "path": "notes/mcp_eval.txt"
+      },
+      "expect": {
+        "success": true,
+        "event_type": "task.mcp_call.completed",
+        "connector": "filesystem_readonly"
+      }
+    },
+    {
+      "id": "filesystem_path_escape_fails_closed",
+      "type": "path_escape",
+      "tool_name": "mcp__filesystem_readonly__read_text",
+      "tool_args": {
+        "path": "../outside.txt"
+      },
+      "expect": {
+        "success": false,
+        "event_type": "task.mcp_call.failed",
+        "error_category": "path_outside_allowed_roots"
+      }
+    },
+    {
+      "id": "disabled_connector_registers_no_tools",
+      "type": "disabled_connector",
+      "expect": {
+        "registered_tools": 0
+      }
+    },
+    {
+      "id": "git_connector_health",
+      "type": "git_connector_health",
+      "expect": {
+        "enabled": true,
+        "health_ok": true,
+        "tool_count": 3,
+        "risk_level": "filesystem/read"
+      }
+    },
+    {
+      "id": "git_status_execution_trace",
+      "type": "git_execution_trace",
+      "tool_name": "mcp__git_readonly__status",
+      "tool_args": {},
+      "expect": {
+        "success": true,
+        "event_type": "task.mcp_call.completed",
+        "connector": "git_readonly"
+      }
+    }
+  ]
+}

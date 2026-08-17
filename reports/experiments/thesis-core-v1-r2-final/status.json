@@ -1,0 +1,11 @@
+{
+  "run_id": "thesis-core-v1-r2-20260810T144148Z",
+  "status": "completed",
+  "started_at": "2026-08-10T14:41:51.269770+00:00",
+  "finished_at": "2026-08-10T14:52:35.763647+00:00",
+  "publishable": true,
+  "planned_attempts": 432,
+  "actual_attempts": 432,
+  "checksums_verified": true,
+  "output_dir": "reports/experiments/thesis-core-v1-r2-final"
+}

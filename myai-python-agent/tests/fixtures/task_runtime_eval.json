@@ -1,0 +1,90 @@
+{
+  "cases": [
+    {
+      "id": "no_tool",
+      "user_id": "eval-no-tool",
+      "content": "hello runtime eval",
+      "expect": {
+        "success": true,
+        "status": "succeeded",
+        "plan_source": "none",
+        "need_tool": false
+      }
+    },
+    {
+      "id": "single_safe_tool",
+      "user_id": "eval-calculator",
+      "content": "calculate 2 + 3",
+      "expect": {
+        "success": true,
+        "status": "succeeded",
+        "tool": "calculator",
+        "plan_source": "rule"
+      }
+    },
+    {
+      "id": "multi_step_chained_task",
+      "user_id": "eval-multi-step",
+      "content": "time now calculate difference until 8 pm",
+      "expect": {
+        "success": true,
+        "status": "succeeded",
+        "plan_source": "rule",
+        "step_count": 2,
+        "tools": ["datetime_info", "calculator"]
+      }
+    },
+    {
+      "id": "invalid_tool_args",
+      "user_id": "eval-invalid-args",
+      "content": "calculate apples",
+      "expect": {
+        "success": false,
+        "status": "failed",
+        "tool": "calculator",
+        "failure_contains": "The request is invalid."
+      }
+    },
+    {
+      "id": "permission_required",
+      "user_id": "eval-permission",
+      "content": "memory maintenance",
+      "expect": {
+        "success": false,
+        "status": "failed",
+        "plan_source": "workflow",
+        "workflow": "memory_maintenance",
+        "permission_required": true
+      }
+    },
+    {
+      "id": "retryable_failure_recovered",
+      "user_id": "eval-retry",
+      "content": "flaky retry please",
+      "expect": {
+        "success": true,
+        "status": "succeeded",
+        "tool": "flaky_retry",
+        "recovery_status": "succeeded_after_retry"
+      }
+    },
+    {
+      "id": "memory_aware_planning",
+      "user_id": "eval-memory-aware",
+      "content": "How should you summarize my tasks?",
+      "seed_memories": [
+        {
+          "content": "User prefers concise task summaries with explicit next steps.",
+          "mem_type": "preference",
+          "slot": "task_summary_style",
+          "value": "concise with next steps"
+        }
+      ],
+      "expect": {
+        "success": true,
+        "status": "succeeded",
+        "memory_selected_min": 1
+      }
+    }
+  ]
+}

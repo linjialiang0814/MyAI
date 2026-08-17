@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - MyAI</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+</head>
+<body>
+<main class="auth-shell" id="auth-shell">
+    <section class="auth-visual" aria-label="MyAI personal agent">
+        <div class="brand-mark">
+            <div class="brand-symbol">AI</div>
+            <span>MyAI</span>
+        </div>
+        <div class="auth-copy">
+            <h1>你的个人智能体工作台</h1>
+            <p>登录后继续管理记忆、知识库、任务流与观测报告，把每一次对话变成可以追踪和改进的工作过程。</p>
+        </div>
+        <div class="agent-scene" aria-hidden="true">
+            <div class="agent-card">输入账号时，我会看向你；输入密码时，我会闭眼回避。</div>
+            <div class="mascot">
+                <div class="mascot-body"></div>
+                <div class="mascot-scarf"></div>
+                <div class="mascot-head">
+                    <div class="mascot-hair"></div>
+                    <div class="mascot-eye left"></div>
+                    <div class="mascot-eye right"></div>
+                    <div class="mascot-mouth"></div>
+                </div>
+                <div class="mascot-arm left"></div>
+                <div class="mascot-arm right"></div>
+                <div class="mascot-panel"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-panel">
+        <div class="container">
+            <h2>欢迎回来</h2>
+            <p class="auth-subtitle">进入 MyAI，继续你的个人智能体工作流。</p>
+
+            <div th:if="${param.error}" class="alert">用户名或密码错误，请重新尝试。</div>
+            <div th:if="${param.logout}" class="success">已成功退出登录。</div>
+            <div th:if="${message}" class="success">[[${message}]]</div>
+
+            <form th:action="@{/login}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="form-field">
+                    <label for="username">账号</label>
+                    <input id="username" type="text" name="username" autocomplete="username" required>
+                </div>
+                <div class="form-field">
+                    <label for="password">密码</label>
+                    <input id="password" type="password" name="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit">登录</button>
+            </form>
+
+            <p>还没有账号？ <a th:href="@{/register}">创建一个</a></p>
+        </div>
+    </section>
+</main>
+<script>
+    const shell = document.getElementById("auth-shell");
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+
+    function setMascotState(state) {
+        shell.classList.remove("is-username", "is-password");
+        if (state) {
+            shell.classList.add(state);
+        }
+    }
+
+    username.addEventListener("focus", () => setMascotState("is-username"));
+    password.addEventListener("focus", () => setMascotState("is-password"));
+    username.addEventListener("blur", () => setMascotState(""));
+    password.addEventListener("blur", () => setMascotState(""));
+</script>
+</body>
+</html>

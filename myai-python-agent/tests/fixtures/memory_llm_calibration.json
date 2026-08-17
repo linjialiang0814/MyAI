@@ -1,0 +1,83 @@
+{
+  "cases": [
+    {
+      "id": "implicit_preference_dark_mode",
+      "input": "Dark mode is much easier on my eyes when I am coding.",
+      "expect_write": true,
+      "expect_mem_type": "preference",
+      "expect_slot": "preference",
+      "expect_confidence_min": 0.65,
+      "expect_confidence_max": 0.9
+    },
+    {
+      "id": "implicit_work_habit",
+      "input": "I usually do my best focused work late at night.",
+      "expect_write": true,
+      "expect_mem_type": "preference",
+      "expect_confidence_min": 0.65,
+      "expect_confidence_max": 0.9
+    },
+    {
+      "id": "natural_language_major",
+      "input": "These days I am studying artificial intelligence at university.",
+      "expect_write": true,
+      "expect_mem_type": "fact",
+      "expect_confidence_min": 0.85,
+      "expect_confidence_max": 0.95
+    },
+    {
+      "id": "stable_goal",
+      "input": "Over the next year I want to turn MyAI into a capable personal agent.",
+      "expect_write": true,
+      "expect_mem_type": "decision",
+      "expect_confidence_min": 0.85,
+      "expect_confidence_max": 0.95
+    },
+    {
+      "id": "stable_opinion",
+      "input": "I believe assistants should explain why they use personal memories.",
+      "expect_write": true,
+      "expect_mem_type": "opinion",
+      "expect_confidence_min": 0.85,
+      "expect_confidence_max": 0.95
+    },
+    {
+      "id": "temporary_request",
+      "input": "Please summarize this paragraph for me.",
+      "expect_write": false
+    },
+    {
+      "id": "question_only",
+      "input": "What programming language should I learn next?",
+      "expect_write": false
+    },
+    {
+      "id": "joke_or_non_durable",
+      "input": "Just kidding, I am the president of Mars.",
+      "expect_write": false
+    },
+    {
+      "id": "negative_memory_command",
+      "input": "Do not remember this: I am considering moving to Shanghai.",
+      "expect_write": false
+    },
+    {
+      "id": "sensitive_secret",
+      "input": "My API key is sk-example-secret-value.",
+      "expect_write": false
+    },
+    {
+      "id": "chinese_implicit_preference",
+      "input": "写代码的时候我更习惯使用深色主题。",
+      "expect_write": true,
+      "expect_mem_type": "preference",
+      "expect_confidence_min": 0.65,
+      "expect_confidence_max": 0.9
+    },
+    {
+      "id": "chinese_temporary_state",
+      "input": "我今天有点累，先休息一会儿。",
+      "expect_write": false
+    }
+  ]
+}

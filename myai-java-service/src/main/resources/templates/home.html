@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>MyAI Personal Agent</title>
+    <link rel="stylesheet" href="/css/home.css" th:href="@{/css/home.css}">
+</head>
+<body>
+<div id="main-interface">
+    <aside class="sidebar">
+        <div class="logo">
+            <img th:src="@{/images/icon.svg}" alt="MyAI logo">
+            <span>MyAI</span>
+        </div>
+
+        <div class="nav-vertical">
+            <button id="sidebar-chat" class="active" onclick="switchTab('chat')"><span>💬</span>对话</button>
+            <button id="sidebar-memory" onclick="switchTab('memory')"><span>🧠</span>记忆</button>
+            <button id="sidebar-knowledge" onclick="switchTab('knowledge')"><span>🧀</span>知识库</button>
+            <button id="sidebar-task" onclick="switchTab('task')"><span>✅</span>任务</button>
+            <button id="sidebar-observability" onclick="switchTab('observability')"><span>📊</span>观测</button>
+            <button id="sidebar-demo" onclick="switchTab('demo')"><span>▶</span>演示</button>
+            <button id="sidebar-settings" onclick="switchTab('settings')"><span>⚙️</span>设置</button>
+        </div>
+
+        <div class="logout-area">
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit">退出登录</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="content">
+        <div id="chat-section" class="section active">
+            <div class="chat-layout agent-cockpit">
+                <aside class="chat-history-panel">
+                    <div class="chat-history-header">
+                        <button class="action-button" onclick="startNewConversation()">新的对话</button>
+                        <button class="action-button" onclick="loadConversations()">刷新对话</button>
+                    </div>
+                    <div id="conversation-list" class="chat-history-list">当前还没有对话</div>
+                </aside>
+                <div class="chat-main">
+                    <div class="chat-toolbar">
+                        <div id="current-conversation-title">当前对话：新对话</div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="action-button" onclick="exportCurrentConversation()">导出</button>
+                        </div>
+                    </div>
+                    <div id="chat-box" class="chat-box"></div>
+                    <div class="input-area">
+                        <input type="text" id="chat-message" placeholder="请在这里输入">
+                        <button id="chat-send-btn" onclick="sendChatMessage()">发送</button>
+                    </div>
+                </div>
+                <aside class="agent-side-panel">
+                    <div class="agent-panel-card">
+                        <div class="agent-panel-title">
+                            <span>Agent 状态</span>
+                            <span id="agent-status-dot" class="agent-status-dot"></span>
+                        </div>
+                        <div id="agent-status-text" class="agent-panel-body">准备就绪，可以开始新的对话。</div>
+                    </div>
+                    <div class="agent-panel-card">
+                        <div class="agent-panel-title">本轮摘要</div>
+                        <div class="agent-metric-grid">
+                            <div class="agent-metric">
+                                <div class="agent-metric-label">Trace steps</div>
+                                <div id="agent-trace-steps" class="agent-metric-value">0</div>
+                            </div>
+                            <div class="agent-metric">
+                                <div class="agent-metric-label">Latency</div>
+                                <div id="agent-trace-latency" class="agent-metric-value">-</div>
+                            </div>
+                            <div class="agent-metric">
+                                <div class="agent-metric-label">Memory</div>
+                                <div id="agent-memory-count" class="agent-metric-value">0</div>
+                            </div>
+                            <div class="agent-metric">
+                                <div class="agent-metric-label">Knowledge</div>
+                                <div id="agent-knowledge-count" class="agent-metric-value">0</div>
+                            </div>
+                        </div>
+                        <div id="agent-trace-tags" class="agent-chip-row"></div>
+                    </div>
+                    <div class="agent-panel-card">
+                        <div class="agent-panel-title">上下文影响</div>
+                        <div id="agent-context-summary" class="agent-panel-body">发送消息后，这里会显示记忆、知识和任务线索如何参与本轮回答。</div>
+                    </div>
+                    <div class="agent-panel-card">
+                        <div class="agent-panel-title">快捷入口</div>
+                        <div class="agent-chip-row">
+                            <button class="agent-chip memory" onclick="switchTab('memory')">查看记忆</button>
+                            <button class="agent-chip knowledge" onclick="switchTab('knowledge')">知识库</button>
+                            <button class="agent-chip task" onclick="switchTab('task')">任务工作台</button>
+                            <button class="agent-chip" onclick="switchTab('observability')">观测</button>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <div id="memory-section" class="section">
+            <div class="scroll-panel">
+                <div class="screen-hero">
+                    <div class="screen-hero-title">记忆工作台</div>
+                    <p class="screen-hero-text">管理 MyAI 对你的长期理解：写入候选、检索上下文、确认不确定记忆，并在需要时查看治理审计。</p>
+                    <div class="workflow-strip">
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 1</div>
+                            <div class="workflow-step-title">写入或对话沉淀</div>
+                            <div class="workflow-step-detail">显式告诉 MyAI 需要记住的事实、偏好或更正。</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 2</div>
+                            <div class="workflow-step-title">确认与治理</div>
+                            <div class="workflow-step-detail">处理 pending 记忆，检查敏感、置信度和冲突状态。</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 3</div>
+                            <div class="workflow-step-title">画像维护</div>
+                            <div class="workflow-step-detail">隐藏、禁用检索、置为历史或查看归并摘要。</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>写入记忆</h3>
+                            <div class="panel-card-subtitle">适合显式保存偏好、事实、项目背景或纠正信息。</div>
+                        </div>
+                    </div>
+                    <div class="input-area">
+                        <input type="text" id="memory-write-input" placeholder="请输入要让MyAI记住的内容：">
+                        <button id="memory-write-btn" onclick="writeMemory()">写入</button>
+                    </div>
+                    <div id="memory-write-result" class="result-box" style="display:none;"></div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>查询记忆</h3>
+                            <div class="panel-card-subtitle">快速查看某个问题会命中哪些长期记忆。</div>
+                        </div>
+                    </div>
+                    <div class="input-area">
+                        <input type="text" id="memory-query-input" placeholder="请输入要查询的记忆:">
+                        <button id="memory-query-btn" onclick="queryMemory()">查询</button>
+                    </div>
+                    <div id="memory-query-result" class="result-box" style="display:none;"></div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>我的记忆画像</h3>
+                            <div class="panel-card-subtitle">默认保持简洁；需要排查时切到审计视图。</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <select id="memory-state-filter" onchange="setMemoryStateFilter(this.value)">
+                            <option value="all">全部</option>
+                            <option value="current">当前</option>
+                            <option value="history">历史</option>
+                        </select>
+                        <select id="memory-consolidation-filter" onchange="setMemoryConsolidationFilter(this.value)">
+                            <option value="all">全部类型</option>
+                            <option value="summary">归并摘要</option>
+                            <option value="evidence">归并证据</option>
+                            <option value="raw">普通记忆</option>
+                        </select>
+                        <select id="memory-visibility-filter" onchange="setMemoryVisibilityFilter(this.value)">
+                            <option value="visible">可见</option>
+                            <option value="hidden">已隐藏</option>
+                            <option value="all">全部可见性</option>
+                        </select>
+                        <select id="memory-view-mode" onchange="setMemoryViewMode(this.value)">
+                            <option value="simple">简洁视图</option>
+                            <option value="audit">审计视图</option>
+                        </select>
+                        <button class="action-button" onclick="loadMemoryProfile()">刷新</button>
+                    </div>
+                    <div id="memory-profile-result" class="result-box" style="display:none;"></div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>待确认记忆</h3>
+                            <div class="panel-card-subtitle">检查尚未进入普通聊天上下文的候选记忆。</div>
+                        </div>
+                    </div>
+                    <button class="action-button" onclick="loadPendingMemories()">刷新</button>
+                    <div id="memory-pending-result" class="result-box" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="knowledge-section" class="section">
+            <div class="scroll-panel">
+                <div class="screen-hero">
+                    <div class="screen-hero-title">知识库工作台</div>
+                    <p class="screen-hero-text">把本地文档转成可检索、可引用、可问答的个人知识。优先围绕“上传、维护、问答”三个动作组织。</p>
+                    <div class="workflow-strip">
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 1</div>
+                            <div class="workflow-step-title">上传文档</div>
+                            <div class="workflow-step-detail">支持 PDF、DOCX、TXT，上传后会解析、分块和生成结构化摘要。</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 2</div>
+                            <div class="workflow-step-title">检查健康</div>
+                            <div class="workflow-step-detail">查看文件状态，必要时修复索引或重建选中文档。</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 3</div>
+                            <div class="workflow-step-title">引用问答</div>
+                            <div class="workflow-step-detail">在全部文件或单文档范围内提问，并查看引用证据。</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>上传个人文件</h3>
+                            <div class="panel-card-subtitle">上传后会自动解析、分块、摘要和建立检索索引。</div>
+                        </div>
+                    </div>
+                    <div class="input-area">
+                        <input type="file" id="knowledge-file-input" accept=".pdf,.docx,.txt">
+                        <button id="knowledge-upload-btn" onclick="uploadKnowledge()">上传</button>
+                    </div>
+                    <div id="knowledge-upload-result" class="result-box" style="display:none;"></div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>我的知识库</h3>
+                            <div class="panel-card-subtitle">查看文档画像、索引健康和维护动作。</div>
+                        </div>
+                    </div>
+                    <button class="action-button" onclick="loadKnowledgeFiles()">刷新</button>
+                    <button id="knowledge-maintenance-check-btn" class="action-button" onclick="runKnowledgeMaintenance(true, false)">健康检查</button>
+                    <button id="knowledge-maintenance-repair-btn" class="action-button" onclick="runKnowledgeMaintenance(false, false)">修复索引</button>
+                    <button id="knowledge-maintenance-rebuild-btn" class="action-button" onclick="runKnowledgeMaintenance(false, true)">重建所选文件</button>
+                    <div id="knowledge-maintenance-result" class="result-box" style="display:none;"></div>
+                    <div id="knowledge-file-list" class="knowledge-list">当前还没有文件</div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div>
+                            <h3>取回知识</h3>
+                            <div class="panel-card-subtitle">普通查询适合检索片段；文档问答适合围绕单个文件深入提问。</div>
+                        </div>
+                    </div>
+                    <div class="input-area">
+                        <select id="knowledge-file-filter">
+                            <option value="">所有文件</option>
+                        </select>
+                        <input type="text" id="knowledge-query-input" placeholder="例如：我的课程笔记保存在哪里？">
+                        <button id="knowledge-query-btn" onclick="queryKnowledge()">查询</button>
+                        <button id="knowledge-qa-btn" onclick="askKnowledgeDocument()">文档问答</button>
+                    </div>
+                    <div id="knowledge-query-result" class="knowledge-result" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="task-section" class="section">
+            <div class="scroll-panel">
+                <div class="screen-hero">
+                    <div class="screen-hero-title">任务工作台</div>
+                    <p class="screen-hero-text">把一次性问答推进为可观察、可恢复、可复用的执行流程。这里集中展示任务、工具、connector 和运行时间线。</p>
+                    <div class="workflow-strip">
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 1</div>
+                            <div class="workflow-step-title">描述目标</div>
+                            <div class="workflow-step-detail">输入自然语言任务，MyAI 会选择可用工具和工作流。</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 2</div>
+                            <div class="workflow-step-title">执行或后台运行</div>
+                            <div class="workflow-step-detail">短任务直接执行，长任务可进入后台并持续查看状态。</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 3</div>
+                            <div class="workflow-step-title">检查时间线</div>
+                            <div class="workflow-step-detail">查看步骤、工具、权限、MCP 调用、错误和恢复信息。</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="task-detail-header">
+                        <h3>任务工作台</h3>
+                        <div class="task-detail-actions">
+                            <button class="action-button" onclick="loadTaskRuns()">刷新</button>
+                        </div>
+                    </div>
+                    <div class="task-workbench">
+                        <div class="task-panel">
+                            <h4>新任务</h4>
+                            <div class="input-area">
+                                <input type="text" id="task-input" placeholder="输入任务描述，例如：检查当前系统信息。">
+                                <button id="task-execute-btn" onclick="executeTask()">执行</button>
+                                <button id="task-background-btn" onclick="startBackgroundTask()">后台执行</button>
+                            </div>
+                            <h4 style="margin-top:16px;">最近任务</h4>
+                            <div id="task-run-list" class="task-run-list">暂无任务</div>
+                            <h4 style="margin-top:16px;">工具目录</h4>
+                            <div class="task-detail-actions">
+                                <button class="action-button" onclick="loadTaskTools()">刷新工具</button>
+                            </div>
+                            <div id="task-tool-list" class="task-run-list">暂无工具信息</div>
+                        </div>
+                        <div class="task-panel">
+                            <div class="task-detail-header">
+                                <h4>任务详情</h4>
+                                <div class="task-detail-actions">
+                                    <button id="task-cancel-btn" class="action-button" onclick="cancelBackgroundTask()" disabled>取消</button>
+                                </div>
+                            </div>
+                            <div id="task-result" class="task-result" style="display:none;"></div>
+                            <div id="task-empty-state" class="quiet-empty">选择最近任务，或从左侧输入一个新任务。执行后这里会显示计划、事件时间线、工具调用和结果摘要。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="observability-section" class="section">
+            <div class="scroll-panel">
+                <div class="screen-hero">
+                    <div class="screen-hero-title">观测工作台</div>
+                    <p class="screen-hero-text">用统一 eval、运行历史、connector health 和 recent events 判断系统是否可靠。这里是开发和维护时的仪表盘。</p>
+                    <div class="workflow-strip">
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 1</div>
+                            <div class="workflow-step-title">查看摘要</div>
+                            <div class="workflow-step-detail">先看任务、connector、最新 eval 和运行计数。</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 2</div>
+                            <div class="workflow-step-title">运行 Eval</div>
+                            <div class="workflow-step-detail">用 MCP 或全部 deterministic eval 快速确认质量门禁。</div>
+                        </div>
+                        <div class="workflow-step-card">
+                            <div class="workflow-step-kicker">Step 3</div>
+                            <div class="workflow-step-title">定位事件</div>
+                            <div class="workflow-step-detail">从 recent events 追踪失败、延迟或 connector 异常。</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="task-detail-header">
+                        <h3>观测工作台</h3>
+                        <div class="task-detail-actions">
+                            <button class="action-button" onclick="loadObservabilityWorkbench()">刷新</button>
+                            <button class="action-button" onclick="runEvalSuite('mcp')">运行 MCP Eval</button>
+                            <button class="action-button" onclick="runEvalSuite('all')">运行全部 Eval</button>
+                        </div>
+                    </div>
+                    <div id="observability-summary" class="task-run-list">暂无观测数据</div>
+                </div>
+                <div class="panel-card">
+                    <h3>Eval Reports</h3>
+                    <div id="observability-reports" class="task-run-list">暂无报告信息</div>
+                </div>
+                <div class="panel-card">
+                    <h3>Recent Events</h3>
+                    <div id="observability-events" class="task-run-list">暂无事件</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="demo-section" class="section">
+            <div class="scroll-panel">
+                <div class="demo-hero">
+                    <h3>演示场景与引导工作流</h3>
+                    <p>这些场景用于安全地展示 MyAI 的核心能力。按钮会跳转到对应工作台并填入示例，不会自动写入敏感数据或上传文件。</p>
+                </div>
+                <div class="demo-grid">
+                    <div class="demo-card">
+                        <div class="demo-card-title">记忆纠正与治理</div>
+                        <div class="demo-card-body">展示 MyAI 如何识别偏好、纠正旧记忆、进入待确认队列，并在记忆页查看治理元数据。</div>
+                        <ol class="demo-steps">
+                            <li>先在聊天中声明一个普通偏好。</li>
+                            <li>再使用“其实/更正”表达变化。</li>
+                            <li>到记忆页查看当前/历史状态。</li>
+                        </ol>
+                        <div class="demo-actions">
+                            <button class="action-button" onclick="startDemoScenario('memory')">填入聊天示例</button>
+                            <button class="action-button" onclick="switchTab('memory')">查看记忆页</button>
+                        </div>
+                    </div>
+                    <div class="demo-card">
+                        <div class="demo-card-title">知识库引用问答</div>
+                        <div class="demo-card-body">展示上传文档、结构化摘要、文档问答和 citation-first 回答。需要先在知识库中上传一个本地 PDF/DOCX/TXT。</div>
+                        <ol class="demo-steps">
+                            <li>进入知识库上传或选择文件。</li>
+                            <li>填入问题并运行文档问答。</li>
+                            <li>查看引用、摘要和证据片段。</li>
+                        </ol>
+                        <div class="demo-actions">
+                            <button class="action-button" onclick="startDemoScenario('knowledge')">打开知识库示例</button>
+                        </div>
+                    </div>
+                    <div class="demo-card">
+                        <div class="demo-card-title">任务执行与恢复</div>
+                        <div class="demo-card-body">展示任务规划、工具执行、timeline、失败/恢复元数据和结果摘要。</div>
+                        <ol class="demo-steps">
+                            <li>将示例任务填入任务工作台。</li>
+                            <li>运行同步任务或后台任务。</li>
+                            <li>查看任务详情和事件时间线。</li>
+                        </ol>
+                        <div class="demo-actions">
+                            <button class="action-button" onclick="startDemoScenario('task')">填入任务示例</button>
+                        </div>
+                    </div>
+                    <div class="demo-card">
+                        <div class="demo-card-title">本地只读工具（MCP-style）</div>
+                        <div class="demo-card-body">展示限定在演示目录内的 filesystem 只读 connector、工具策略、权限映射和调用轨迹。标准 MCP Server 互操作将在下一检查点接入。</div>
+                        <ol class="demo-steps">
+                            <li>打开任务工作台查看工具目录。</li>
+                            <li>填入读取合成演示文件的任务。</li>
+                            <li>确认 timeline 中的 MCP call 事件。</li>
+                        </ol>
+                        <div class="demo-actions">
+                            <button class="action-button" onclick="startDemoScenario('mcp')">填入 MCP 示例</button>
+                            <button class="action-button" onclick="loadTaskTools(); switchTab('task')">查看工具目录</button>
+                        </div>
+                    </div>
+                    <div class="demo-card">
+                        <div class="demo-card-title">观测与质量门禁</div>
+                        <div class="demo-card-body">展示统一 eval、运行历史、quality gate、connector health 和 recent events。</div>
+                        <ol class="demo-steps">
+                            <li>进入观测工作台。</li>
+                            <li>运行 MCP 或全部 deterministic eval。</li>
+                            <li>回到健康中心查看 gate 状态。</li>
+                        </ol>
+                        <div class="demo-actions">
+                            <button class="action-button" onclick="startDemoScenario('observability')">打开观测示例</button>
+                            <button class="action-button" onclick="runEvalSuite('mcp')">运行 MCP Eval</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="demo-guidance-result" class="result-box demo-output" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div id="settings-section" class="section">
+            <div class="scroll-panel">
+                <div class="settings-section-grid">
+                    <div>
+                        <div class="task-detail-header">
+                            <h3>系统健康中心</h3>
+                            <div class="task-detail-actions">
+                                <button class="action-button" onclick="loadSystemHealthCenter()">刷新健康状态</button>
+                                <button class="action-button" onclick="runHealthGate()">运行质量门禁</button>
+                            </div>
+                        </div>
+                        <div id="system-health-center" class="health-status-card">
+                            <div class="health-status-title">正在加载系统状态</div>
+                            <div class="health-status-text">这里会汇总模型配置、Java/Python 服务、记忆策略、知识库、connector 和 eval gate。</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3>账号信息</h3>
+                        <div class="settings-card">
+                            <div class="settings-item">
+                                <div class="settings-label">用户名：</div>
+                                <div class="settings-value" th:text="${user.username}">username</div>
+                            </div>
+
+                            <div class="settings-item">
+                                <div class="settings-label">邮箱：</div>
+                                <div class="settings-value" th:text="${user.email}">email@example.com</div>
+                            </div>
+
+                            <div class="settings-item">
+                                <div class="settings-label">注册时间：</div>
+                                <div class="settings-value" th:text="${formattedCreateTime}">2026-03-20 12:00:00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3>记忆设置</h3>
+                        <div class="settings-card">
+                            <label class="settings-control">
+                                <span>
+                                    <span class="settings-label">启用长期记忆</span>
+                                    <span class="settings-value">允许写入与检索记忆</span>
+                                </span>
+                                <input id="memory-enabled-setting" type="checkbox">
+                            </label>
+                            <label class="settings-control">
+                                <span>
+                                    <span class="settings-label">自动写入记忆</span>
+                                    <span class="settings-value">聊天时自动沉淀候选记忆</span>
+                                </span>
+                                <input id="auto-write-enabled-setting" type="checkbox">
+                            </label>
+                            <label class="settings-control">
+                                <span>
+                                    <span class="settings-label">敏感记忆需要确认</span>
+                                    <span class="settings-value">敏感候选进入待确认队列</span>
+                                </span>
+                                <input id="sensitive-confirmation-setting" type="checkbox">
+                            </label>
+                            <label class="settings-control">
+                                <span>
+                                    <span class="settings-label">默认记忆视图</span>
+                                    <span class="settings-value">打开记忆页时使用的卡片模式</span>
+                                </span>
+                                <select id="default-memory-view-setting">
+                                    <option value="simple">简洁视图</option>
+                                    <option value="audit">审计视图</option>
+                                </select>
+                            </label>
+                            <div class="settings-actions">
+                                <button class="action-button" onclick="saveMemorySettings()">保存记忆设置</button>
+                                <button class="action-button" onclick="loadMemorySettings()">刷新</button>
+                            </div>
+                            <div id="memory-settings-result" class="result-box" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    const currentUserId = /*[[${user.id}]]*/ 0;
+    const currentUsername = /*[[${user.username}]]*/ "";
+</script>
+
+<script src="/js/home/core.js" th:src="@{/js/home/core.js}" defer></script>
+<script src="/js/home/chat.js" th:src="@{/js/home/chat.js}" defer></script>
+<script src="/js/home/memory.js" th:src="@{/js/home/memory.js}" defer></script>
+<script src="/js/home/knowledge.js" th:src="@{/js/home/knowledge.js}" defer></script>
+<script src="/js/home/task.js" th:src="@{/js/home/task.js}" defer></script>
+<script src="/js/home/observability.js" th:src="@{/js/home/observability.js}" defer></script>
+<script src="/js/home/app.js" th:src="@{/js/home/app.js}" defer></script>
+</body>
+</html>

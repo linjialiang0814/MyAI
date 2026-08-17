@@ -1,0 +1,428 @@
+{
+  "write_cases": [
+    {
+      "id": "should_not_write_question",
+      "input": "what is my major?",
+      "expect_written": false
+    },
+    {
+      "id": "negative_command_english",
+      "input": "Don't remember this: my major is CS",
+      "expect_written": false
+    },
+    {
+      "id": "common_phrase_should_not_write",
+      "input": "thanks",
+      "expect_written": false
+    },
+    {
+      "id": "ambiguous_question_should_not_write",
+      "input": "maybe my major is CS?",
+      "expect_written": false
+    },
+    {
+      "id": "fact_major_slot",
+      "input": "my major is CS",
+      "expect_written": true,
+      "expect_mem_type": "fact",
+      "expect_slot": "major",
+      "expect_value": "computer science",
+      "expect_review_status": "accepted",
+      "expect_slot_retrieval_weight": 1.15,
+      "expect_slot_review_confidence_threshold": 0.7,
+      "expect_calibrated_confidence_min": 0.94,
+      "expect_calibration_factors_contains": [
+        "slot:major",
+        "source:user_explicit",
+        "method:rule"
+      ]
+    },
+    {
+      "id": "preference_slot",
+      "input": "I like Python",
+      "expect_written": true,
+      "expect_mem_type": "preference",
+      "expect_slot": "preference",
+      "expect_value": "python",
+      "expect_review_status": "accepted",
+      "expect_slot_retrieval_weight": 1.2,
+      "expect_slot_review_confidence_threshold": 0.7,
+      "expect_calibrated_confidence_min": 0.93,
+      "expect_calibration_factors_contains": [
+        "slot:preference",
+        "source:user_explicit",
+        "method:rule"
+      ]
+    },
+    {
+      "id": "password_manager_job_is_not_secret",
+      "input": "my job is password manager",
+      "expect_written": true,
+      "expect_mem_type": "fact",
+      "expect_slot": "job",
+      "expect_value": "password manager",
+      "expect_review_status": "accepted",
+      "expect_sensitivity": "personal",
+      "expect_sensitive_category": "none"
+    }
+  ],
+  "sensitive_cases": [
+    {
+      "id": "explicit_password_is_rejected",
+      "content": "my password is 123456",
+      "mem_type": "fact",
+      "confidence": 0.95,
+      "source": "chat_extraction",
+      "importance": 5,
+      "base_metadata": {
+        "slot": "secret",
+        "value": "123456",
+        "extraction_method": "llm"
+      },
+      "expect_review_status": "rejected",
+      "expect_sensitivity": "sensitive",
+      "expect_sensitive_category": "secret",
+      "expect_review_reason_contains": "secret"
+    },
+    {
+      "id": "id_card_fact_goes_pending",
+      "content": "my id card expires next month",
+      "mem_type": "fact",
+      "confidence": 0.95,
+      "source": "chat_extraction",
+      "importance": 5,
+      "base_metadata": {
+        "slot": "document",
+        "value": "id card",
+        "extraction_method": "llm"
+      },
+      "expect_review_status": "pending",
+      "expect_sensitivity": "sensitive",
+      "expect_sensitive_category": "personal_sensitive",
+      "expect_review_reason_contains": "sensitive"
+    }
+  ],
+  "multi_candidate_cases": [
+    {
+      "id": "rule_compound_major_and_preference",
+      "mode": "rule",
+      "input": "my major is CS and I like Python",
+      "expect_candidate_count": 2,
+      "expect_written_count": 2,
+      "expect_memories": [
+        {
+          "mem_type": "fact",
+          "slot": "major",
+          "value": "computer science",
+          "review_status": "accepted",
+          "calibrated_confidence_min": 0.9
+        },
+        {
+          "mem_type": "preference",
+          "slot": "preference",
+          "value": "python",
+          "review_status": "accepted",
+          "calibrated_confidence_min": 0.9
+        }
+      ]
+    },
+    {
+      "id": "llm_multi_candidate_implied_preference_pending",
+      "mode": "fixture",
+      "input": "my major is computer science and concise answers work best for me",
+      "candidates": [
+        {
+          "content": "my major is computer science",
+          "mem_type": "fact",
+          "importance": 5,
+          "confidence": 0.92,
+          "canonical_key": "major",
+          "canonical_value": "computer science",
+          "metadata": {
+            "slot": "major",
+            "value": "computer science",
+            "extraction_method": "llm",
+            "extraction_reason": "user stated major"
+          }
+        },
+        {
+          "content": "I prefer concise answers",
+          "mem_type": "preference",
+          "importance": 4,
+          "confidence": 0.78,
+          "canonical_key": "preference",
+          "canonical_value": "concise answers",
+          "metadata": {
+            "slot": "preference",
+            "value": "concise answers",
+            "extraction_method": "llm",
+            "extraction_reason": "user implied response style preference"
+          }
+        }
+      ],
+      "expect_candidate_count": 2,
+      "expect_written_count": 2,
+      "expect_memories": [
+        {
+          "mem_type": "fact",
+          "slot": "major",
+          "value": "computer science",
+          "review_status": "accepted",
+          "calibrated_confidence_min": 0.85
+        },
+        {
+          "mem_type": "preference",
+          "slot": "preference",
+          "value": "concise answers",
+          "review_status": "pending",
+          "calibrated_confidence_max": 0.65,
+          "review_reason_contains": "multi-candidate confidence"
+        }
+      ]
+    }
+  ],
+  "dedup_cases": [
+    {
+      "id": "major_alias_value_merge",
+      "seed": "my major is computer science",
+      "input": "my major is CS",
+      "expect_action": "merge",
+      "expect_active_count": 1,
+      "expect_merged_count": 1,
+      "expect_last_merge_type": "exact"
+    }
+  ],
+  "conflict_cases": [
+    {
+      "id": "major_single_value_supersede",
+      "seed": "my major is computer science",
+      "input": "Actually, my major is artificial intelligence",
+      "expect_action": "supersede",
+      "expect_old_status": "superseded",
+      "expect_old_current": false,
+      "expect_new_status": "active",
+      "expect_new_current": true
+    },
+    {
+      "id": "preference_multi_value_coexist",
+      "seed": "I like Python",
+      "input": "I like JavaScript",
+      "expect_action": "add",
+      "expect_old_status": "active",
+      "expect_new_status": "active"
+    },
+    {
+      "id": "preference_multi_value_negation",
+      "seed": "I like Python",
+      "input": "I no longer like Python",
+      "expect_action": "negate",
+      "expect_old_status": "superseded",
+      "expect_old_current": false,
+      "expect_new_status": null,
+      "expect_active_count": 0
+    }
+  ],
+  "temporal_cases": [
+    {
+      "id": "location_move_preserves_history",
+      "seed": "I live Shanghai",
+      "input": "I moved to Beijing",
+      "expect_action": "supersede",
+      "expect_old_status": "superseded",
+      "expect_old_current": false,
+      "expect_new_status": "active",
+      "expect_new_current": true,
+      "expect_previous_link": true,
+      "expect_old_historical_reason_contains": "corrected"
+    }
+  ],
+  "citation_cases": [
+    {
+      "id": "retrieved_memory_can_be_cited",
+      "seed": "my major is computer science",
+      "query": "what is your major",
+      "expect_citation_content": "my major is computer science",
+      "expect_citation_type": "fact"
+    }
+  ],
+  "retrieval_policy_cases": [
+    {
+      "id": "recent_decision_beats_stale_decision",
+      "memories": [
+        {
+          "memory_id": "old-decision",
+          "content": "old decision",
+          "similarity": 0.82,
+          "mem_type": "decision",
+          "mem_status": "active",
+          "score": 0.8,
+          "importance": 5,
+          "confidence": 0.9,
+          "source": "chat_extraction",
+          "observed_age_days": 900
+        },
+        {
+          "memory_id": "recent-decision",
+          "content": "recent decision",
+          "similarity": 0.76,
+          "mem_type": "decision",
+          "mem_status": "active",
+          "score": 0.8,
+          "importance": 5,
+          "confidence": 0.9,
+          "source": "chat_extraction",
+          "observed_age_days": 0
+        }
+      ],
+      "expect_higher_score": "recent-decision",
+      "expect_lower_score": "old-decision",
+      "expect_factor": "freshness_weight"
+    },
+    {
+      "id": "explicit_source_beats_unknown_source",
+      "memories": [
+        {
+          "memory_id": "unknown-source",
+          "content": "unknown source memory",
+          "similarity": 0.8,
+          "mem_type": "fact",
+          "mem_status": "active",
+          "score": 0.8,
+          "importance": 5,
+          "confidence": 0.9,
+          "source": ""
+        },
+        {
+          "memory_id": "explicit-source",
+          "content": "explicit source memory",
+          "similarity": 0.8,
+          "mem_type": "fact",
+          "mem_status": "active",
+          "score": 0.8,
+          "importance": 5,
+          "confidence": 0.9,
+          "source": "user_explicit"
+        }
+      ],
+      "expect_higher_score": "explicit-source",
+      "expect_lower_score": "unknown-source",
+      "expect_factor": "source_weight"
+    },
+    {
+      "id": "current_memory_beats_non_current_memory",
+      "memories": [
+        {
+          "memory_id": "historical",
+          "content": "historical active memory",
+          "similarity": 0.85,
+          "mem_type": "fact",
+          "mem_status": "active",
+          "score": 0.8,
+          "importance": 5,
+          "confidence": 0.9,
+          "is_current": false
+        },
+        {
+          "memory_id": "current",
+          "content": "current memory",
+          "similarity": 0.76,
+          "mem_type": "fact",
+          "mem_status": "active",
+          "score": 0.8,
+          "importance": 5,
+          "confidence": 0.9,
+          "is_current": true
+        }
+      ],
+      "expect_higher_score": "current",
+      "expect_lower_score": "historical",
+      "expect_factor": "current_weight"
+    }
+  ],
+  "calibration_cases": [
+    {
+      "id": "llm_implied_preference_is_down_calibrated",
+      "content": "I prefer concise answers",
+      "mem_type": "preference",
+      "confidence": 0.78,
+      "source": "chat_extraction",
+      "importance": 4,
+      "base_metadata": {
+        "slot": "preference",
+        "value": "concise answers",
+        "extraction_method": "llm",
+        "extraction_reason": "user implied response style preference"
+      },
+      "expect_review_status": "pending",
+      "expect_calibrated_confidence_max": 0.65,
+      "expect_calibration_factors_contains": [
+        "slot:preference",
+        "method:llm",
+        "weak_signal"
+      ]
+    },
+    {
+      "id": "explicit_major_is_up_calibrated",
+      "content": "my major is CS",
+      "mem_type": "fact",
+      "confidence": 0.85,
+      "source": "user_explicit",
+      "importance": 5,
+      "base_metadata": {
+        "slot": "major",
+        "value": "cs",
+        "extraction_method": "rule"
+      },
+      "expect_review_status": "accepted",
+      "expect_calibrated_confidence_min": 0.94,
+      "expect_calibration_factors_contains": [
+        "slot:major",
+        "source:user_explicit",
+        "method:rule"
+      ]
+    },
+    {
+      "id": "ambiguous_opinion_is_down_calibrated",
+      "content": "I think maybe this approach is useful",
+      "mem_type": "opinion",
+      "confidence": 0.72,
+      "source": "chat_extraction",
+      "importance": 4,
+      "base_metadata": {
+        "slot": "opinion",
+        "value": "maybe this approach is useful",
+        "extraction_method": "llm",
+        "extraction_reason": "user probably expressed an uncertain opinion"
+      },
+      "expect_review_status": "pending",
+      "expect_calibrated_confidence_max": 0.55,
+      "expect_calibration_factors_contains": [
+        "slot:opinion",
+        "method:llm",
+        "weak_signal"
+      ]
+    },
+    {
+      "id": "low_importance_decision_requires_review_by_slot_policy",
+      "content": "I plan to try a new workflow",
+      "mem_type": "decision",
+      "confidence": 0.95,
+      "source": "user_explicit",
+      "importance": 3,
+      "base_metadata": {
+        "slot": "plan",
+        "value": "try a new workflow",
+        "extraction_method": "rule"
+      },
+      "expect_review_status": "pending",
+      "expect_slot_retrieval_weight": 1.25,
+      "expect_slot_low_importance_review_threshold": 4,
+      "expect_calibrated_confidence_min": 0.9,
+      "expect_calibration_factors_contains": [
+        "slot:decision",
+        "source:user_explicit",
+        "method:rule"
+      ]
+    }
+  ]
+}

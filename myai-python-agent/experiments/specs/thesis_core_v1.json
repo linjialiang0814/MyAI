@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "experiment_id": "thesis-core-v1-r2",
+  "description": "Frozen local-model comparison for memory governance and RAG retrieval strategies.",
+  "model": {
+    "provider": "openai_compatible",
+    "runtime": "ollama",
+    "runtime_version": "0.32.6",
+    "compute_backend": "cpu_only",
+    "model_id": "qwen2.5:1.5b-instruct-q4_K_M",
+    "digest_prefix": "65ec06548149",
+    "base_url": "http://127.0.0.1:11435/v1",
+    "api_key_env": "MYAI_OPENAI_COMPATIBLE_API_KEY",
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 128,
+    "context_budget_tokens": 4096,
+    "timeout_seconds": 120,
+    "max_retries": 0,
+    "fallback_to_stub": false
+  },
+  "embedding": {
+    "provider": "openai_compatible",
+    "runtime": "ollama",
+    "runtime_version": "0.32.6",
+    "compute_backend": "cpu_only",
+    "model_id": "bge-m3:latest",
+    "digest_prefix": "790764642607",
+    "base_url": "http://127.0.0.1:11435/v1",
+    "api_key_env": "MYAI_OPENAI_COMPATIBLE_EMBEDDING_API_KEY",
+    "dimensions": 1024,
+    "timeout_seconds": 60,
+    "max_retries": 0,
+    "fallback_to_stub": false
+  },
+  "hardware": {
+    "os_contains": "Windows-11-10.0.26200",
+    "cpu_contains": "i7-12700H",
+    "cpu_physical_cores": 14,
+    "cpu_logical_processors": 20,
+    "ram_gib_min": 15.0,
+    "gpu_contains": "RTX 3050 Laptop GPU",
+    "gpu_memory_mib": 4096,
+    "nvidia_driver": "546.30",
+    "python": "3.12.6"
+  },
+  "dataset": {
+    "path": "../datasets/thesis_core_v1.json",
+    "sha256": "5e72f76c1a610427affab3354c117c08e60e101c4cf1a800102241c520754ea3"
+  },
+  "memory_variants": ["none", "basic", "governed"],
+  "rag_variants": ["vector", "hybrid", "hybrid_rerank"],
+  "retrieval": {
+    "top_k": 3,
+    "candidate_multiplier": 6,
+    "chunk_size_chars": 700,
+    "chunk_overlap_chars": 100,
+    "selection_context_budget_tokens": 1350,
+    "reranker": "lightweight_rule_v1"
+  },
+  "execution": {
+    "repeats": 3,
+    "warmup_requests": 1,
+    "case_order_seed": 42,
+    "concurrency": 1,
+    "resource_sample_interval_ms": 500,
+    "require_loopback": true
+  },
+  "artifacts": {
+    "output_root": "../../.runtime/experiments",
+    "formats": ["json", "jsonl", "csv", "markdown", "sha256"]
+  }
+}

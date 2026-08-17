@@ -1,0 +1,153 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  quality-gates:
+    name: Static quality gates
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate repository
+        run: ./scripts/ci-quality-gates.ps1
+
+  python-tests:
+    name: Python 3.12 tests
+    needs: quality-gates
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUTF8: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: myai-python-agent/requirements.txt
+
+      - name: Install pinned dependencies
+        working-directory: myai-python-agent
+        run: python -m pip install --disable-pip-version-check --requirement requirements.txt
+
+      - name: Run full Python suite
+        working-directory: myai-python-agent
+        run: python -m unittest discover -s tests -t . -p "test_*.py"
+
+  java-verify:
+    name: Java 17 verify
+    needs: quality-gates
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: myai-java-service/pom.xml
+
+      - name: Test and package Java service
+        working-directory: myai-java-service
+        run: ./mvnw.cmd --batch-mode --no-transfer-progress verify
+
+      - name: Upload verified application JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-application-jar
+          path: |
+            myai-java-service/target/*.jar
+            !myai-java-service/target/*.jar.original
+          if-no-files-found: error
+          retention-days: 7
+
+  portable-artifact:
+    name: Portable artifact
+    needs:
+      - python-tests
+      - java-verify
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Download verified application JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: java-application-jar
+          path: myai-java-service/target
+
+      - name: Build portable ZIP
+        run: ./scripts/build-portable.ps1 -OutputDirectory "$env:RUNNER_TEMP\myai-portable" -SkipJavaBuild
+
+      - name: Verify portable ZIP
+        run: |
+          $artifacts = @(Get-ChildItem -LiteralPath "$env:RUNNER_TEMP\myai-portable" -Filter "MyAI-*-windows-x64.zip" -File)
+          if ($artifacts.Count -ne 1) {
+              throw "Expected exactly one portable ZIP, found $($artifacts.Count)."
+          }
+          ./scripts/verify-portable.ps1 -ArtifactPath $artifacts[0].FullName
+
+      - name: Test portable safety controls
+        run: |
+          $artifacts = @(Get-ChildItem -LiteralPath "$env:RUNNER_TEMP\myai-portable" -Filter "MyAI-*-windows-x64.zip" -File)
+          if ($artifacts.Count -ne 1) {
+              throw "Expected exactly one portable ZIP, found $($artifacts.Count)."
+          }
+          $extractRoot = Join-Path $env:RUNNER_TEMP "myai-portable-control-test"
+          Expand-Archive -LiteralPath $artifacts[0].FullName -DestinationPath $extractRoot -Force
+          $packageRoots = @(Get-ChildItem -LiteralPath $extractRoot -Directory)
+          if ($packageRoots.Count -ne 1) {
+              throw "Expected exactly one extracted portable root."
+          }
+          ./scripts/test-portable-controls.ps1 -PackageRoot $packageRoots[0].FullName
+
+      - name: Upload portable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyAI-${{ github.sha }}-windows-x64
+          path: |
+            ${{ runner.temp }}/myai-portable/*.zip
+            ${{ runner.temp }}/myai-portable/*.zip.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7

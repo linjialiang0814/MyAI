@@ -1,0 +1,81 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Environment and secrets
+.env
+.env.*
+*.env
+*.env.*
+!.env.example
+!*.env.example
+scripts/start-myai.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-cache-files-*/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Java and Maven
+target/
+build/
+.m2repo/
+.maven-home/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Local vector stores and uploaded knowledge files
+chroma_db/
+knowledge_data/
+myai-python-agent/chroma_db/
+myai-python-agent/knowledge_data/
+myai-python-agent/.runtime/
+myai-python-agent/.tmp/
+myai-python-agent/tmp*/
+myai-python-agent/.knowledge-admin-chroma-*/
+myai-python-agent/.knowledge-workflow-chroma-*/
+myai-python-agent/memory_settings/
+myai-python-agent/app/chroma_db/
+myai-python-agent/app/memory/chroma_db/
+
+# Local model runtimes and weights
+.ollama/
+models/
+*.gguf
+*.safetensors
+*.onnx
+*.pt
+*.pth
+*.ckpt
+
+# Large local report artifacts
+report/*.pdf
+reports/*.pdf
+
+# Logs and runtime output
+*.log
+logs/
+myai-python-agent/calibration-report*.json
+
+# Portable release output and generated private configuration
+dist/
+packaging/windows/config/app.env

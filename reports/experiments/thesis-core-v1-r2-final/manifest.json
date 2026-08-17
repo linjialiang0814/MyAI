@@ -1,0 +1,928 @@
+{
+  "schema_version": 1,
+  "run_id": "thesis-core-v1-r2-20260810T144148Z",
+  "experiment_id": "thesis-core-v1-r2",
+  "started_at": "2026-08-10T14:41:51.269770+00:00",
+  "publishable": true,
+  "publishable_candidate": true,
+  "exploratory": false,
+  "clients_injected": false,
+  "spec_path": "myai-python-agent/experiments/specs/thesis_core_v1.json",
+  "spec_sha256": "6e461f4a61e30bdd67ff4a1c721fc92a8493ba44688c3c79138493f4bd08e5e5",
+  "dataset": {
+    "id": "myai-thesis-core-v1-r2",
+    "path": "myai-python-agent/experiments/datasets/thesis_core_v1.json",
+    "sha256": "5e72f76c1a610427affab3354c117c08e60e101c4cf1a800102241c520754ea3",
+    "memory_cases": 18,
+    "rag_documents": 10,
+    "rag_cases": 30
+  },
+  "requirements_sha256": "d3ff51281f225ab6567dbe2dbe2b4c58d57424c41eb971424c6b03af3a1c2426",
+  "selected_suites": [
+    "memory",
+    "rag"
+  ],
+  "memory_variants": [
+    "none",
+    "basic",
+    "governed"
+  ],
+  "rag_variants": [
+    "vector",
+    "hybrid",
+    "hybrid_rerank"
+  ],
+  "execution": {
+    "repeats": 3,
+    "warmup_requests": 1,
+    "case_order_seed": 42,
+    "concurrency": 1,
+    "resource_sample_interval_ms": 500,
+    "require_loopback": true,
+    "actual_repeats": 3,
+    "max_cases": null,
+    "planned_attempts": 432,
+    "actual_attempts": 432,
+    "variant_order_by_suite": {
+      "memory": [
+        {
+          "repeat": 1,
+          "order": [
+            "none",
+            "basic",
+            "governed"
+          ]
+        },
+        {
+          "repeat": 2,
+          "order": [
+            "basic",
+            "governed",
+            "none"
+          ]
+        },
+        {
+          "repeat": 3,
+          "order": [
+            "governed",
+            "none",
+            "basic"
+          ]
+        }
+      ],
+      "rag": [
+        {
+          "repeat": 1,
+          "order": [
+            "vector",
+            "hybrid",
+            "hybrid_rerank"
+          ]
+        },
+        {
+          "repeat": 2,
+          "order": [
+            "hybrid",
+            "hybrid_rerank",
+            "vector"
+          ]
+        },
+        {
+          "repeat": 3,
+          "order": [
+            "hybrid_rerank",
+            "vector",
+            "hybrid"
+          ]
+        }
+      ]
+    }
+  },
+  "retrieval": {
+    "top_k": 3,
+    "candidate_multiplier": 6,
+    "chunk_size_chars": 700,
+    "chunk_overlap_chars": 100,
+    "selection_context_budget_tokens": 1350,
+    "reranker": "lightweight_rule_v1"
+  },
+  "model": {
+    "provider": "openai_compatible",
+    "runtime": "ollama",
+    "runtime_version": "0.32.6",
+    "compute_backend": "cpu_only",
+    "model_id": "qwen2.5:1.5b-instruct-q4_K_M",
+    "digest_prefix": "65ec06548149",
+    "base_url": "http://127.0.0.1:11435/v1",
+    "temperature": 0.0,
+    "seed": 42,
+    "timeout_seconds": 120,
+    "max_retries": 0,
+    "fallback_to_stub": false
+  },
+  "embedding": {
+    "provider": "openai_compatible",
+    "runtime": "ollama",
+    "runtime_version": "0.32.6",
+    "compute_backend": "cpu_only",
+    "model_id": "bge-m3:latest",
+    "digest_prefix": "790764642607",
+    "base_url": "http://127.0.0.1:11435/v1",
+    "dimensions": 1024,
+    "timeout_seconds": 60,
+    "max_retries": 0,
+    "fallback_to_stub": false
+  },
+  "preflight": {
+    "hardware": {
+      "os": "Windows-11-10.0.26200-SP0",
+      "os_version": "10.0.26200",
+      "python": "3.12.6",
+      "cpu": "12th Gen Intel(R) Core(TM) i7-12700H",
+      "cpu_physical_cores": 14,
+      "cpu_logical_processors": 20,
+      "ram_gib": 15.8,
+      "gpu": {
+        "available": true,
+        "name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+        "memory_total_mib": 4096,
+        "driver_version": "546.30"
+      }
+    },
+    "hardware_checks": [
+      {
+        "id": "os_contains",
+        "passed": true,
+        "message": "expected 'Windows-11-10.0.26200'; actual 'Windows-11-10.0.26200-SP0'"
+      },
+      {
+        "id": "cpu_contains",
+        "passed": true,
+        "message": "expected 'i7-12700H'; actual '12th Gen Intel(R) Core(TM) i7-12700H'"
+      },
+      {
+        "id": "gpu_contains",
+        "passed": true,
+        "message": "expected 'RTX 3050 Laptop GPU'; actual 'NVIDIA GeForce RTX 3050 Laptop GPU'"
+      },
+      {
+        "id": "python",
+        "passed": true,
+        "message": "expected '3.12.6'; actual '3.12.6'"
+      },
+      {
+        "id": "cpu_physical_cores",
+        "passed": true,
+        "message": "expected 14; actual 14"
+      },
+      {
+        "id": "cpu_logical_processors",
+        "passed": true,
+        "message": "expected 20; actual 20"
+      },
+      {
+        "id": "ram_gib_min",
+        "passed": true,
+        "message": "expected >= 15.0; actual 15.8"
+      },
+      {
+        "id": "gpu_memory_mib",
+        "passed": true,
+        "message": "expected 4096; actual 4096"
+      },
+      {
+        "id": "nvidia_driver",
+        "passed": true,
+        "message": "expected 546.30; actual 546.30"
+      }
+    ],
+    "dependencies": {
+      "requirements_sha256": "d3ff51281f225ab6567dbe2dbe2b4c58d57424c41eb971424c6b03af3a1c2426",
+      "observed": {
+        "annotated-doc": "0.0.4",
+        "annotated-types": "0.7.0",
+        "anyio": "4.12.1",
+        "attrs": "25.4.0",
+        "backoff": "2.2.1",
+        "bcrypt": "5.0.0",
+        "build": "1.4.0",
+        "certifi": "2026.1.4",
+        "cffi": "2.0.0",
+        "charset-normalizer": "3.4.4",
+        "chromadb": "1.4.1",
+        "click": "8.3.1",
+        "colorama": "0.4.6",
+        "coloredlogs": "15.0.1",
+        "cryptography": "46.0.3",
+        "distro": "1.9.0",
+        "durationpy": "0.10",
+        "fastapi": "0.128.0",
+        "filelock": "3.20.3",
+        "flatbuffers": "25.12.19",
+        "fsspec": "2026.1.0",
+        "googleapis-common-protos": "1.72.0",
+        "grpcio": "1.76.0",
+        "h11": "0.16.0",
+        "hf-xet": "1.2.0",
+        "httpcore": "1.0.9",
+        "httptools": "0.7.1",
+        "httpx": "0.28.1",
+        "huggingface_hub": "1.3.4",
+        "humanfriendly": "10.0",
+        "idna": "3.11",
+        "importlib_metadata": "8.7.1",
+        "importlib_resources": "6.5.2",
+        "jiter": "0.12.0",
+        "jsonschema": "4.26.0",
+        "jsonschema-specifications": "2025.9.1",
+        "kubernetes": "35.0.0",
+        "markdown-it-py": "4.0.0",
+        "mdurl": "0.1.2",
+        "mmh3": "5.2.0",
+        "mpmath": "1.3.0",
+        "numpy": "2.4.1",
+        "oauthlib": "3.3.1",
+        "onnxruntime": "1.23.2",
+        "openai": "2.15.0",
+        "opentelemetry-api": "1.39.1",
+        "opentelemetry-exporter-otlp-proto-common": "1.39.1",
+        "opentelemetry-exporter-otlp-proto-grpc": "1.39.1",
+        "opentelemetry-proto": "1.39.1",
+        "opentelemetry-sdk": "1.39.1",
+        "opentelemetry-semantic-conventions": "0.60b1",
+        "orjson": "3.11.5",
+        "overrides": "7.7.0",
+        "packaging": "26.0",
+        "posthog": "5.4.0",
+        "protobuf": "6.33.4",
+        "psutil": "7.2.2",
+        "pybase64": "1.4.3",
+        "pycparser": "3.0",
+        "pydantic": "2.12.5",
+        "pydantic_core": "2.41.5",
+        "pygments": "2.19.2",
+        "pypdf": "6.1.2",
+        "pypika": "0.50.0",
+        "pyproject_hooks": "1.2.0",
+        "pyreadline3": "3.5.4",
+        "python-dateutil": "2.9.0.post0",
+        "python-docx": "1.2.0",
+        "python-dotenv": "1.2.1",
+        "python-multipart": "0.0.20",
+        "pyyaml": "6.0.3",
+        "referencing": "0.37.0",
+        "requests": "2.32.5",
+        "requests-oauthlib": "2.0.0",
+        "rich": "14.3.1",
+        "rpds-py": "0.30.0",
+        "shellingham": "1.5.4",
+        "six": "1.17.0",
+        "sniffio": "1.3.1",
+        "starlette": "0.50.0",
+        "sympy": "1.14.0",
+        "tenacity": "9.1.2",
+        "tokenizers": "0.22.2",
+        "tqdm": "4.67.1",
+        "typer": "0.21.1",
+        "typer-slim": "0.21.1",
+        "typing-inspection": "0.4.2",
+        "typing_extensions": "4.15.0",
+        "urllib3": "2.6.3",
+        "uvicorn": "0.40.0",
+        "volcengine-python-sdk": "5.0.7",
+        "watchfiles": "1.1.1",
+        "websocket-client": "1.9.0",
+        "websockets": "16.0",
+        "zipp": "3.23.0"
+      },
+      "checks": [
+        {
+          "package": "annotated-doc",
+          "passed": true,
+          "message": "annotated-doc: expected 0.0.4; actual 0.0.4"
+        },
+        {
+          "package": "annotated-types",
+          "passed": true,
+          "message": "annotated-types: expected 0.7.0; actual 0.7.0"
+        },
+        {
+          "package": "anyio",
+          "passed": true,
+          "message": "anyio: expected 4.12.1; actual 4.12.1"
+        },
+        {
+          "package": "attrs",
+          "passed": true,
+          "message": "attrs: expected 25.4.0; actual 25.4.0"
+        },
+        {
+          "package": "backoff",
+          "passed": true,
+          "message": "backoff: expected 2.2.1; actual 2.2.1"
+        },
+        {
+          "package": "bcrypt",
+          "passed": true,
+          "message": "bcrypt: expected 5.0.0; actual 5.0.0"
+        },
+        {
+          "package": "build",
+          "passed": true,
+          "message": "build: expected 1.4.0; actual 1.4.0"
+        },
+        {
+          "package": "certifi",
+          "passed": true,
+          "message": "certifi: expected 2026.1.4; actual 2026.1.4"
+        },
+        {
+          "package": "cffi",
+          "passed": true,
+          "message": "cffi: expected 2.0.0; actual 2.0.0"
+        },
+        {
+          "package": "charset-normalizer",
+          "passed": true,
+          "message": "charset-normalizer: expected 3.4.4; actual 3.4.4"
+        },
+        {
+          "package": "chromadb",
+          "passed": true,
+          "message": "chromadb: expected 1.4.1; actual 1.4.1"
+        },
+        {
+          "package": "click",
+          "passed": true,
+          "message": "click: expected 8.3.1; actual 8.3.1"
+        },
+        {
+          "package": "colorama",
+          "passed": true,
+          "message": "colorama: expected 0.4.6; actual 0.4.6"
+        },
+        {
+          "package": "coloredlogs",
+          "passed": true,
+          "message": "coloredlogs: expected 15.0.1; actual 15.0.1"
+        },
+        {
+          "package": "cryptography",
+          "passed": true,
+          "message": "cryptography: expected 46.0.3; actual 46.0.3"
+        },
+        {
+          "package": "distro",
+          "passed": true,
+          "message": "distro: expected 1.9.0; actual 1.9.0"
+        },
+        {
+          "package": "durationpy",
+          "passed": true,
+          "message": "durationpy: expected 0.10; actual 0.10"
+        },
+        {
+          "package": "fastapi",
+          "passed": true,
+          "message": "fastapi: expected 0.128.0; actual 0.128.0"
+        },
+        {
+          "package": "filelock",
+          "passed": true,
+          "message": "filelock: expected 3.20.3; actual 3.20.3"
+        },
+        {
+          "package": "flatbuffers",
+          "passed": true,
+          "message": "flatbuffers: expected 25.12.19; actual 25.12.19"
+        },
+        {
+          "package": "fsspec",
+          "passed": true,
+          "message": "fsspec: expected 2026.1.0; actual 2026.1.0"
+        },
+        {
+          "package": "googleapis-common-protos",
+          "passed": true,
+          "message": "googleapis-common-protos: expected 1.72.0; actual 1.72.0"
+        },
+        {
+          "package": "grpcio",
+          "passed": true,
+          "message": "grpcio: expected 1.76.0; actual 1.76.0"
+        },
+        {
+          "package": "h11",
+          "passed": true,
+          "message": "h11: expected 0.16.0; actual 0.16.0"
+        },
+        {
+          "package": "hf-xet",
+          "passed": true,
+          "message": "hf-xet: expected 1.2.0; actual 1.2.0"
+        },
+        {
+          "package": "httpcore",
+          "passed": true,
+          "message": "httpcore: expected 1.0.9; actual 1.0.9"
+        },
+        {
+          "package": "httptools",
+          "passed": true,
+          "message": "httptools: expected 0.7.1; actual 0.7.1"
+        },
+        {
+          "package": "httpx",
+          "passed": true,
+          "message": "httpx: expected 0.28.1; actual 0.28.1"
+        },
+        {
+          "package": "huggingface_hub",
+          "passed": true,
+          "message": "huggingface_hub: expected 1.3.4; actual 1.3.4"
+        },
+        {
+          "package": "humanfriendly",
+          "passed": true,
+          "message": "humanfriendly: expected 10.0; actual 10.0"
+        },
+        {
+          "package": "idna",
+          "passed": true,
+          "message": "idna: expected 3.11; actual 3.11"
+        },
+        {
+          "package": "importlib_metadata",
+          "passed": true,
+          "message": "importlib_metadata: expected 8.7.1; actual 8.7.1"
+        },
+        {
+          "package": "importlib_resources",
+          "passed": true,
+          "message": "importlib_resources: expected 6.5.2; actual 6.5.2"
+        },
+        {
+          "package": "jiter",
+          "passed": true,
+          "message": "jiter: expected 0.12.0; actual 0.12.0"
+        },
+        {
+          "package": "jsonschema",
+          "passed": true,
+          "message": "jsonschema: expected 4.26.0; actual 4.26.0"
+        },
+        {
+          "package": "jsonschema-specifications",
+          "passed": true,
+          "message": "jsonschema-specifications: expected 2025.9.1; actual 2025.9.1"
+        },
+        {
+          "package": "kubernetes",
+          "passed": true,
+          "message": "kubernetes: expected 35.0.0; actual 35.0.0"
+        },
+        {
+          "package": "markdown-it-py",
+          "passed": true,
+          "message": "markdown-it-py: expected 4.0.0; actual 4.0.0"
+        },
+        {
+          "package": "mdurl",
+          "passed": true,
+          "message": "mdurl: expected 0.1.2; actual 0.1.2"
+        },
+        {
+          "package": "mmh3",
+          "passed": true,
+          "message": "mmh3: expected 5.2.0; actual 5.2.0"
+        },
+        {
+          "package": "mpmath",
+          "passed": true,
+          "message": "mpmath: expected 1.3.0; actual 1.3.0"
+        },
+        {
+          "package": "numpy",
+          "passed": true,
+          "message": "numpy: expected 2.4.1; actual 2.4.1"
+        },
+        {
+          "package": "oauthlib",
+          "passed": true,
+          "message": "oauthlib: expected 3.3.1; actual 3.3.1"
+        },
+        {
+          "package": "onnxruntime",
+          "passed": true,
+          "message": "onnxruntime: expected 1.23.2; actual 1.23.2"
+        },
+        {
+          "package": "openai",
+          "passed": true,
+          "message": "openai: expected 2.15.0; actual 2.15.0"
+        },
+        {
+          "package": "opentelemetry-api",
+          "passed": true,
+          "message": "opentelemetry-api: expected 1.39.1; actual 1.39.1"
+        },
+        {
+          "package": "opentelemetry-exporter-otlp-proto-common",
+          "passed": true,
+          "message": "opentelemetry-exporter-otlp-proto-common: expected 1.39.1; actual 1.39.1"
+        },
+        {
+          "package": "opentelemetry-exporter-otlp-proto-grpc",
+          "passed": true,
+          "message": "opentelemetry-exporter-otlp-proto-grpc: expected 1.39.1; actual 1.39.1"
+        },
+        {
+          "package": "opentelemetry-proto",
+          "passed": true,
+          "message": "opentelemetry-proto: expected 1.39.1; actual 1.39.1"
+        },
+        {
+          "package": "opentelemetry-sdk",
+          "passed": true,
+          "message": "opentelemetry-sdk: expected 1.39.1; actual 1.39.1"
+        },
+        {
+          "package": "opentelemetry-semantic-conventions",
+          "passed": true,
+          "message": "opentelemetry-semantic-conventions: expected 0.60b1; actual 0.60b1"
+        },
+        {
+          "package": "orjson",
+          "passed": true,
+          "message": "orjson: expected 3.11.5; actual 3.11.5"
+        },
+        {
+          "package": "overrides",
+          "passed": true,
+          "message": "overrides: expected 7.7.0; actual 7.7.0"
+        },
+        {
+          "package": "packaging",
+          "passed": true,
+          "message": "packaging: expected 26.0; actual 26.0"
+        },
+        {
+          "package": "posthog",
+          "passed": true,
+          "message": "posthog: expected 5.4.0; actual 5.4.0"
+        },
+        {
+          "package": "protobuf",
+          "passed": true,
+          "message": "protobuf: expected 6.33.4; actual 6.33.4"
+        },
+        {
+          "package": "psutil",
+          "passed": true,
+          "message": "psutil: expected 7.2.2; actual 7.2.2"
+        },
+        {
+          "package": "pybase64",
+          "passed": true,
+          "message": "pybase64: expected 1.4.3; actual 1.4.3"
+        },
+        {
+          "package": "pycparser",
+          "passed": true,
+          "message": "pycparser: expected 3.0; actual 3.0"
+        },
+        {
+          "package": "pydantic",
+          "passed": true,
+          "message": "pydantic: expected 2.12.5; actual 2.12.5"
+        },
+        {
+          "package": "pydantic_core",
+          "passed": true,
+          "message": "pydantic_core: expected 2.41.5; actual 2.41.5"
+        },
+        {
+          "package": "pygments",
+          "passed": true,
+          "message": "pygments: expected 2.19.2; actual 2.19.2"
+        },
+        {
+          "package": "pypdf",
+          "passed": true,
+          "message": "pypdf: expected 6.1.2; actual 6.1.2"
+        },
+        {
+          "package": "pypika",
+          "passed": true,
+          "message": "pypika: expected 0.50.0; actual 0.50.0"
+        },
+        {
+          "package": "pyproject_hooks",
+          "passed": true,
+          "message": "pyproject_hooks: expected 1.2.0; actual 1.2.0"
+        },
+        {
+          "package": "pyreadline3",
+          "passed": true,
+          "message": "pyreadline3: expected 3.5.4; actual 3.5.4"
+        },
+        {
+          "package": "python-dateutil",
+          "passed": true,
+          "message": "python-dateutil: expected 2.9.0.post0; actual 2.9.0.post0"
+        },
+        {
+          "package": "python-docx",
+          "passed": true,
+          "message": "python-docx: expected 1.2.0; actual 1.2.0"
+        },
+        {
+          "package": "python-dotenv",
+          "passed": true,
+          "message": "python-dotenv: expected 1.2.1; actual 1.2.1"
+        },
+        {
+          "package": "python-multipart",
+          "passed": true,
+          "message": "python-multipart: expected 0.0.20; actual 0.0.20"
+        },
+        {
+          "package": "pyyaml",
+          "passed": true,
+          "message": "pyyaml: expected 6.0.3; actual 6.0.3"
+        },
+        {
+          "package": "referencing",
+          "passed": true,
+          "message": "referencing: expected 0.37.0; actual 0.37.0"
+        },
+        {
+          "package": "requests",
+          "passed": true,
+          "message": "requests: expected 2.32.5; actual 2.32.5"
+        },
+        {
+          "package": "requests-oauthlib",
+          "passed": true,
+          "message": "requests-oauthlib: expected 2.0.0; actual 2.0.0"
+        },
+        {
+          "package": "rich",
+          "passed": true,
+          "message": "rich: expected 14.3.1; actual 14.3.1"
+        },
+        {
+          "package": "rpds-py",
+          "passed": true,
+          "message": "rpds-py: expected 0.30.0; actual 0.30.0"
+        },
+        {
+          "package": "shellingham",
+          "passed": true,
+          "message": "shellingham: expected 1.5.4; actual 1.5.4"
+        },
+        {
+          "package": "six",
+          "passed": true,
+          "message": "six: expected 1.17.0; actual 1.17.0"
+        },
+        {
+          "package": "sniffio",
+          "passed": true,
+          "message": "sniffio: expected 1.3.1; actual 1.3.1"
+        },
+        {
+          "package": "starlette",
+          "passed": true,
+          "message": "starlette: expected 0.50.0; actual 0.50.0"
+        },
+        {
+          "package": "sympy",
+          "passed": true,
+          "message": "sympy: expected 1.14.0; actual 1.14.0"
+        },
+        {
+          "package": "tenacity",
+          "passed": true,
+          "message": "tenacity: expected 9.1.2; actual 9.1.2"
+        },
+        {
+          "package": "tokenizers",
+          "passed": true,
+          "message": "tokenizers: expected 0.22.2; actual 0.22.2"
+        },
+        {
+          "package": "tqdm",
+          "passed": true,
+          "message": "tqdm: expected 4.67.1; actual 4.67.1"
+        },
+        {
+          "package": "typer",
+          "passed": true,
+          "message": "typer: expected 0.21.1; actual 0.21.1"
+        },
+        {
+          "package": "typer-slim",
+          "passed": true,
+          "message": "typer-slim: expected 0.21.1; actual 0.21.1"
+        },
+        {
+          "package": "typing-inspection",
+          "passed": true,
+          "message": "typing-inspection: expected 0.4.2; actual 0.4.2"
+        },
+        {
+          "package": "typing_extensions",
+          "passed": true,
+          "message": "typing_extensions: expected 4.15.0; actual 4.15.0"
+        },
+        {
+          "package": "urllib3",
+          "passed": true,
+          "message": "urllib3: expected 2.6.3; actual 2.6.3"
+        },
+        {
+          "package": "uvicorn",
+          "passed": true,
+          "message": "uvicorn: expected 0.40.0; actual 0.40.0"
+        },
+        {
+          "package": "volcengine-python-sdk",
+          "passed": true,
+          "message": "volcengine-python-sdk: expected 5.0.7; actual 5.0.7"
+        },
+        {
+          "package": "watchfiles",
+          "passed": true,
+          "message": "watchfiles: expected 1.1.1; actual 1.1.1"
+        },
+        {
+          "package": "websocket-client",
+          "passed": true,
+          "message": "websocket-client: expected 1.9.0; actual 1.9.0"
+        },
+        {
+          "package": "websockets",
+          "passed": true,
+          "message": "websockets: expected 16.0; actual 16.0"
+        },
+        {
+          "package": "zipp",
+          "passed": true,
+          "message": "zipp: expected 3.23.0; actual 3.23.0"
+        }
+      ],
+      "passed": true
+    },
+    "git": {
+      "commit": "63f884ed2233814ff7830872a40a5625a2c5f3e3",
+      "branch": "codex/phase2-thesis-evidence",
+      "dirty": false,
+      "dirty_file_count": 0
+    },
+    "provider": {
+      "runtime": "ollama",
+      "version": "0.32.6",
+      "endpoint": "http://127.0.0.1:11435",
+      "server_process": {
+        "pid": 20160,
+        "name": "ollama.exe",
+        "created_at": "2026-08-10T14:40:02.689471+00:00",
+        "listener_port": 11435,
+        "resource_scope": "root process and recursive children"
+      },
+      "models": {
+        "qwen2.5:1.5b-instruct-q4_K_M": {
+          "name": "qwen2.5:1.5b-instruct-q4_K_M",
+          "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+          "size": 986061892,
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen2",
+            "families": [
+              "qwen2"
+            ],
+            "parameter_size": "1.5B",
+            "quantization_level": "Q4_K_M",
+            "context_length": 32768,
+            "embedding_length": 1536
+          }
+        },
+        "bge-m3:latest": {
+          "name": "bge-m3:latest",
+          "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "size": 1157672605,
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "bert",
+            "families": [
+              "bert"
+            ],
+            "parameter_size": "566.70M",
+            "quantization_level": "F16",
+            "context_length": 8192,
+            "embedding_length": 1024
+          }
+        }
+      },
+      "compute_backend_contract": {
+        "expected": "cpu_only",
+        "operator_declared": "",
+        "operator_declaration_matches": false,
+        "verification_scope": "optional operator declaration; the strict gate uses Ollama /api/ps after warm-up"
+      },
+      "embedding_probe": {
+        "dimensions": 1024,
+        "sha256": "f851908eafbceb7d3ac39b75b37e0694d03901348446c335fd54e8ba24ea7d7c",
+        "latency_ms": 659.525,
+        "used_as_warmup": true
+      },
+      "loaded_backend": {
+        "passed": true,
+        "verification_source": "Ollama /api/ps after warm-up",
+        "expected_compute_backend": "cpu_only",
+        "expected_context_length": 4096,
+        "models": {
+          "qwen2.5:1.5b-instruct-q4_K_M": {
+            "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+            "size": 1169980128,
+            "size_vram": 0,
+            "context_length": 4096,
+            "processor": "100% CPU",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "qwen2",
+              "families": [
+                "qwen2"
+              ],
+              "parameter_size": "1.5B",
+              "quantization_level": "Q4_K_M"
+            }
+          },
+          "bge-m3:latest": {
+            "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+            "size": 1218969598,
+            "size_vram": 0,
+            "context_length": 4096,
+            "processor": "100% CPU",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "bert",
+              "families": [
+                "bert"
+              ],
+              "parameter_size": "566.70M",
+              "quantization_level": "F16"
+            }
+          }
+        },
+        "checks": [
+          {
+            "model_id": "qwen2.5:1.5b-instruct-q4_K_M",
+            "passed": true,
+            "reason": "expected size_vram=0 and context_length=4096; actual size_vram=0, context_length=4096"
+          },
+          {
+            "model_id": "bge-m3:latest",
+            "passed": true,
+            "reason": "expected size_vram=0 and context_length=4096; actual size_vram=0, context_length=4096"
+          }
+        ]
+      }
+    }
+  },
+  "state_isolation": {
+    "memory": "fresh in-memory store per case/arm/repeat",
+    "rag": "one shared immutable ephemeral Chroma index across all RAG arms",
+    "personal_runtime_data_accessed": false
+  },
+  "warmup": {
+    "contract": "one untimed warm-up request per model before measured cases",
+    "included_in_case_latency": false,
+    "embedding": {
+      "requests": 1,
+      "source": "preflight_validation_probe",
+      "latency_ms": 659.525
+    },
+    "llm": {
+      "requests": 1,
+      "source": "dedicated_warmup",
+      "latency_ms": 3204.811
+    }
+  },
+  "completion_gate": {
+    "passed": true,
+    "planned_attempts": 432,
+    "actual_attempts": 432,
+    "observed_model_failures": 0,
+    "infrastructure_failures": 0,
+    "infrastructure_failure_categories": [],
+    "backend_verified": true,
+    "work_directory_cleaned": true,
+    "checksum_verification_required": true
+  }
+}
